@@ -1,0 +1,1529 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>QR Attendance | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #eef2ff;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e5eaf2;
+            --surface: #ffffff;
+            --background: #f5f7fc;
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        /* NAVIGATION */
+
+        .navbar {
+            min-height: 76px;
+            padding: 14px 5%;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            box-shadow: 0 5px 12px rgba(79, 70, 229, .2);
+        }
+
+        .brand-text h2 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -.4px;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #64748b;
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .nav-links a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* MAIN LAYOUT */
+
+        .container {
+            width: min(100% - 40px, 1000px);
+            margin: 38px auto 55px;
+        }
+
+        .breadcrumb {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 18px;
+        }
+
+        .breadcrumb span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+            color: #172033;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .page-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+        }
+
+        .page-label .dot {
+            width: 7px;
+            height: 7px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        /* SCANNER CARD */
+
+        .scanner-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .scanner-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .scanner-heading h2 {
+            font-size: 17px;
+            font-weight: 750;
+            letter-spacing: -.3px;
+        }
+
+        .scanner-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 7px;
+            line-height: 1.6;
+        }
+
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 11px;
+            border-radius: 8px;
+            background: #ecfdf5;
+            color: #15803d;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .camera-area {
+            background: #f8faff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        #reader {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        #reader video {
+            border-radius: 10px;
+        }
+
+        #reader__scan_region {
+            min-height: 250px;
+        }
+
+        #reader__dashboard {
+            padding-top: 10px;
+        }
+
+        #reader button,
+        #reader select {
+            border: 1px solid var(--border) !important;
+            border-radius: 7px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+        }
+
+        .camera-caption {
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 12px;
+        }
+
+        .stop-btn {
+            display: block;
+            margin: 15px auto 0;
+            padding: 10px 17px;
+            background: #fff1f2;
+            color: #be123c;
+            border: 1px solid #fecdd3;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .stop-btn:hover {
+            background: #ffe4e6;
+        }
+
+        /* DIVIDER */
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 25px 0;
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* UPLOAD */
+
+        .upload-section {
+            text-align: center;
+        }
+
+        .upload-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            background: var(--primary);
+            color: white;
+            padding: 13px 22px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 5px 12px rgba(79, 70, 229, .18);
+            transition: .2s;
+        }
+
+        .upload-label:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        #qrFile {
+            display: none;
+        }
+
+        .upload-help {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* RESULT */
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px 18px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            min-height: 52px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .info {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        /* OTP SECTION */
+
+        .otp-section {
+            display: none;
+            margin-top: 28px;
+            padding: 28px;
+            border: 1px solid #c7d2fe;
+            background: linear-gradient(145deg, #f5f7ff, #eef2ff);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .otp-section.show {
+            display: block;
+            animation: reveal .3s ease;
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .otp-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 14px;
+            border-radius: 17px;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 27px;
+        }
+
+        .otp-section h2 {
+            color: #312e81;
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 9px;
+        }
+
+        .otp-section > p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .otp-email-message {
+            margin-top: 8px;
+            color: #4338ca !important;
+            font-weight: 700;
+        }
+
+        .otp-input {
+            width: 100%;
+            max-width: 280px;
+            margin: 21px auto 15px;
+            display: block;
+            padding: 14px;
+            border: 2px solid #c7d2fe;
+            border-radius: 10px;
+            background: white;
+            text-align: center;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: 9px;
+            color: #312e81;
+            outline: none;
+            transition: .2s;
+        }
+
+        .otp-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, .10);
+        }
+
+        .otp-input::placeholder {
+            color: #cbd5e1;
+        }
+
+        .verify-btn {
+            width: 100%;
+            max-width: 280px;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: #16a34a;
+            color: white;
+            font-size: 12px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .verify-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .verify-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .otp-timer {
+            margin-top: 16px;
+            color: #dc2626 !important;
+            font-weight: 750;
+            font-size: 12px !important;
+        }
+
+        .security-note {
+            max-width: 480px;
+            margin: 19px auto 0;
+            padding: 12px 14px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #eab308;
+            border-radius: 8px;
+            color: #854d0e !important;
+            font-size: 10px !important;
+            text-align: left;
+        }
+
+        /* INFORMATION */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            padding: 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .info-item .info-icon {
+            font-size: 19px;
+            margin-bottom: 9px;
+        }
+
+        .info-item h3 {
+            font-size: 11px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .info-item p {
+            font-size: 10px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 13px 18px;
+                flex-direction: column;
+                gap: 13px;
+            }
+
+            .brand {
+                justify-content: center;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .nav-links a {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .container {
+                width: min(100% - 26px, 650px);
+                margin-top: 25px;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .scanner-card {
+                padding: 19px;
+            }
+
+            .scanner-heading {
+                flex-direction: column;
+            }
+
+            .camera-area {
+                padding: 10px;
+            }
+
+            .otp-section {
+                padding: 22px 15px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .brand-text h2 {
+                font-size: 13px;
+            }
+
+            .nav-links {
+                gap: 2px;
+            }
+
+            .nav-links a {
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            .page-header h1 {
+                font-size: 21px;
+            }
+
+            .scanner-card {
+                padding: 15px;
+            }
+
+            .otp-input {
+                font-size: 22px;
+                letter-spacing: 7px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="brand">
+            <div class="brand-icon">✓</div>
+            <div class="brand-text">
+                <h2>Smart Attendance</h2>
+                <p>Attendance & Payroll Management</p>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/employees">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/qr-attendance" class="active">QR Attendance</a>
+            <a href="/payroll">Payroll</a>
+        </div>
+
+    </nav>
+
+    <main class="container">
+
+        <div class="breadcrumb">
+            Dashboard / <span>QR Attendance</span>
+        </div>
+
+        <div class="page-header">
+            <div class="page-label">
+                <span class="dot"></span>
+                Secure attendance system
+            </div>
+
+            <h1>QR Attendance Verification</h1>
+
+            <p>
+                Scan an employee QR code and complete secure email OTP verification
+                to record attendance.
+            </p>
+        </div>
+
+        <section class="scanner-card">
+
+            <div class="scanner-heading">
+                <div>
+                    <h2>Scan Employee QR Code</h2>
+                    <p>
+                        Use your device camera or upload a downloaded employee QR image.
+                    </p>
+                </div>
+
+                <div class="secure-badge">
+                    🔒 Secure Verification
+                </div>
+            </div>
+
+            <div class="camera-area">
+
+                <div id="reader"></div>
+
+                <p class="camera-caption">
+                    Position the QR code inside the camera scanning area.
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="stop-btn"
+                onclick="stopCamera()">
+
+                ■ Stop Camera
+
+            </button>
+
+            <div class="divider">OR UPLOAD QR IMAGE</div>
+
+            <div class="upload-section">
+
+                <label for="qrFile" class="upload-label">
+                    📁 Upload QR Image
+                </label>
+
+                <input
+                    type="file"
+                    id="qrFile"
+                    accept="image/*">
+
+                <p class="upload-help">
+                    Select your downloaded employee QR image, such as QR_EMP001.png.
+                </p>
+
+            </div>
+
+            <div id="result" class="result-box">
+                Waiting for QR scan...
+            </div>
+
+            <!-- OTP SECTION -->
+
+            <div id="otpSection" class="otp-section">
+
+                <div class="otp-icon">🔐</div>
+
+                <h2>OTP Verification</h2>
+
+                <p>
+                    Your QR code has been verified successfully.
+                </p>
+
+                <p class="otp-email-message">
+                    A 6-digit OTP has been sent to your registered email address.
+                </p>
+
+                <input
+                    type="text"
+                    id="otpInput"
+                    class="otp-input"
+                    maxlength="6"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    placeholder="000000">
+
+                <button
+                    type="button"
+                    id="verifyOtpButton"
+                    class="verify-btn"
+                    onclick="verifyOTP()">
+
+                    🔓 Verify OTP & Record Attendance
+
+                </button>
+
+                <p id="otpTimer" class="otp-timer">
+                    OTP expires in 02:00
+                </p>
+
+                <p class="security-note">
+                    🔒 Do not share your OTP with anyone.
+                    This OTP can only be used once and expires after 2 minutes.
+                </p>
+
+            </div>
+
+        </section>
+
+        <section class="info-grid">
+
+            <div class="info-item">
+                <div class="info-icon">📷</div>
+                <h3>QR Code Scanning</h3>
+                <p>Scan an employee QR code using the device camera.</p>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">📧</div>
+                <h3>Email OTP Security</h3>
+                <p>Complete the additional verification using the registered email OTP.</p>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">⏱️</div>
+                <h3>Time-Limited OTP</h3>
+                <p>Each OTP is valid for two minutes and can only be used once.</p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        Smart Attendance & Payroll System © 2026. All rights reserved.
+    </footer>
+
+    <script>
+
+        let html5QrCode = null;
+
+        let isProcessing = false;
+
+        let currentEmployeeCode = null;
+
+        let otpTimerInterval = null;
+
+
+        /*
+         * QR CODE PROCESSING
+         */
+
+        async function processQRCode(employeeCode) {
+
+            if (isProcessing) {
+                return;
+            }
+
+            isProcessing = true;
+
+            currentEmployeeCode = employeeCode;
+
+
+            const resultBox =
+                document.getElementById("result");
+
+            const otpSection =
+                document.getElementById("otpSection");
+
+
+            resultBox.className =
+                "result-box info";
+
+            resultBox.textContent =
+                "🔍 Verifying QR code...";
+
+
+            stopCamera();
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/qr-attendance/scan",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                "employeeCode=" +
+                                encodeURIComponent(employeeCode)
+                        }
+                    );
+
+
+                const message =
+                    await response.text();
+
+
+                if (response.ok) {
+
+                    resultBox.className =
+                        "result-box success";
+
+                    resultBox.textContent =
+                        "✅ " + message;
+
+
+                    otpSection.classList.add("show");
+
+
+                    document.getElementById(
+                        "otpInput"
+                    ).value = "";
+
+
+                    /*
+                     * Start a NEW 2-minute timer.
+                     *
+                     * This also ENABLES the Verify button
+                     * again if the previous OTP expired.
+                     */
+
+                    startOtpTimer();
+
+
+                    setTimeout(function() {
+
+                        document.getElementById(
+                            "otpInput"
+                        ).focus();
+
+                    }, 300);
+
+                } else {
+
+                    resultBox.className =
+                        "result-box error";
+
+                    resultBox.textContent =
+                        "❌ " + message;
+
+                    currentEmployeeCode = null;
+
+                }
+
+
+            } catch (error) {
+
+                resultBox.className =
+                    "result-box error";
+
+                resultBox.textContent =
+                    "❌ Unable to connect to server.";
+
+                currentEmployeeCode = null;
+
+            }
+
+
+            setTimeout(function() {
+
+                isProcessing = false;
+
+            }, 1500);
+
+        }
+
+
+        /*
+         * VERIFY OTP
+         */
+
+        async function verifyOTP() {
+
+            const otpInput =
+                document.getElementById("otpInput");
+
+
+            const verifyButton =
+                document.getElementById(
+                    "verifyOtpButton"
+                );
+
+
+            const resultBox =
+                document.getElementById("result");
+
+
+            const otp =
+                otpInput.value.trim();
+
+
+            if (!currentEmployeeCode) {
+
+                resultBox.className =
+                    "result-box error";
+
+                resultBox.textContent =
+                    "❌ Please scan the QR code again.";
+
+                return;
+
+            }
+
+
+            if (!/^\d{6}$/.test(otp)) {
+
+                resultBox.className =
+                    "result-box error";
+
+                resultBox.textContent =
+                    "❌ Please enter the 6-digit OTP.";
+
+                otpInput.focus();
+
+                return;
+
+            }
+
+
+            verifyButton.disabled = true;
+
+            verifyButton.textContent =
+                "⏳ Verifying...";
+
+
+            resultBox.className =
+                "result-box info";
+
+            resultBox.textContent =
+                "🔐 Verifying OTP...";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/qr-attendance/verify-otp",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                "employeeCode=" +
+                                encodeURIComponent(
+                                    currentEmployeeCode
+                                )
+                                +
+                                "&otp=" +
+                                encodeURIComponent(otp)
+                        }
+                    );
+
+
+                const message =
+                    await response.text();
+
+
+                if (response.ok) {
+
+                    resultBox.className =
+                        "result-box success";
+
+                    resultBox.textContent =
+                        "✅ " + message;
+
+
+                    document
+                        .getElementById("otpSection")
+                        .classList.remove("show");
+
+
+                    stopOtpTimer();
+
+
+                    currentEmployeeCode = null;
+
+
+                    otpInput.value = "";
+
+
+                } else {
+
+                    resultBox.className =
+                        "result-box error";
+
+                    resultBox.textContent =
+                        "❌ " + message;
+
+                }
+
+
+            } catch (error) {
+
+                resultBox.className =
+                    "result-box error";
+
+                resultBox.textContent =
+                    "❌ Unable to connect to server.";
+
+            }
+
+
+            /*
+             * Enable the button again.
+             *
+             * This allows another OTP attempt if the
+             * server rejects the entered OTP.
+             */
+
+            verifyButton.disabled = false;
+
+            verifyButton.textContent =
+                "🔓 Verify OTP & Record Attendance";
+
+        }
+
+
+        /*
+         * OTP TIMER
+         */
+
+        function startOtpTimer() {
+
+            /*
+             * Stop any previous timer first.
+             */
+
+            stopOtpTimer();
+
+
+            /*
+             * IMPORTANT FIX:
+             *
+             * If the previous OTP expired,
+             * the Verify button was disabled.
+             *
+             * When a new QR scan creates a new OTP,
+             * enable the button again.
+             */
+
+            const verifyButton =
+                document.getElementById(
+                    "verifyOtpButton"
+                );
+
+            verifyButton.disabled = false;
+
+            verifyButton.textContent =
+                "🔓 Verify OTP & Record Attendance";
+
+
+            let remainingSeconds = 120;
+
+
+            const timerElement =
+                document.getElementById(
+                    "otpTimer"
+                );
+
+
+            timerElement.style.color =
+                "#dc2626";
+
+
+            updateOtpTimer(
+                remainingSeconds,
+                timerElement
+            );
+
+
+            otpTimerInterval =
+                setInterval(function() {
+
+                    remainingSeconds--;
+
+
+                    updateOtpTimer(
+                        remainingSeconds,
+                        timerElement
+                    );
+
+
+                    if (remainingSeconds <= 0) {
+
+                        stopOtpTimer();
+
+
+                        timerElement.textContent =
+                            "OTP expired. Please scan the QR code again.";
+
+
+                        timerElement.style.color =
+                            "#dc2626";
+
+
+                        verifyButton.disabled =
+                            true;
+
+                    }
+
+                }, 1000);
+
+        }
+
+
+        /*
+         * UPDATE TIMER TEXT
+         */
+
+        function updateOtpTimer(
+            seconds,
+            timerElement
+        ) {
+
+            const minutes =
+                Math.floor(seconds / 60);
+
+
+            const remaining =
+                seconds % 60;
+
+
+            const formattedMinutes =
+                String(minutes).padStart(2, "0");
+
+
+            const formattedSeconds =
+                String(remaining).padStart(2, "0");
+
+
+            timerElement.textContent =
+                "OTP expires in "
+                + formattedMinutes
+                + ":"
+                + formattedSeconds;
+
+        }
+
+
+        /*
+         * STOP OTP TIMER
+         */
+
+        function stopOtpTimer() {
+
+            if (otpTimerInterval) {
+
+                clearInterval(
+                    otpTimerInterval
+                );
+
+                otpTimerInterval = null;
+
+            }
+
+        }
+
+
+        /*
+         * QR CAMERA SUCCESS
+         */
+
+        function onScanSuccess(decodedText) {
+
+            console.log(
+                "QR Code detected:",
+                decodedText
+            );
+
+
+            processQRCode(decodedText);
+
+        }
+
+
+        /*
+         * QR CAMERA FAILURE
+         *
+         * Continuous scanning errors are ignored.
+         */
+
+        function onScanFailure(error) {
+
+            // Ignore continuous camera scan errors.
+
+        }
+
+
+        /*
+         * START CAMERA
+         */
+
+        function startCamera() {
+
+            if (html5QrCode) {
+                return;
+            }
+
+
+            html5QrCode =
+                new Html5Qrcode("reader");
+
+
+            const config = {
+
+                fps: 10,
+
+                qrbox: {
+                    width: 250,
+                    height: 250
+                }
+
+            };
+
+
+            html5QrCode.start(
+
+                {
+                    facingMode: "environment"
+                },
+
+                config,
+
+                onScanSuccess,
+
+                onScanFailure
+
+            ).catch(function(error) {
+
+                console.log(
+                    "Camera error:",
+                    error
+                );
+
+            });
+
+        }
+
+
+        /*
+         * STOP CAMERA
+         */
+
+        function stopCamera() {
+
+            if (html5QrCode) {
+
+                html5QrCode.stop()
+
+                    .then(function() {
+
+                        console.log(
+                            "Camera stopped."
+                        );
+
+                        html5QrCode = null;
+
+                    })
+
+                    .catch(function(error) {
+
+                        console.log(
+                            "Camera stop error:",
+                            error
+                        );
+
+                        html5QrCode = null;
+
+                    });
+
+            }
+
+        }
+
+
+        /*
+         * QR IMAGE UPLOAD
+         */
+
+        document
+            .getElementById("qrFile")
+            .addEventListener(
+                "change",
+                function(event) {
+
+
+                    const file =
+                        event.target.files[0];
+
+
+                    if (!file) {
+                        return;
+                    }
+
+
+                    if (isProcessing) {
+                        return;
+                    }
+
+
+                    const resultBox =
+                        document.getElementById(
+                            "result"
+                        );
+
+
+                    resultBox.className =
+                        "result-box info";
+
+
+                    resultBox.textContent =
+                        "🔍 Reading QR image...";
+
+
+                    const fileScanner =
+                        new Html5Qrcode(
+                            "reader"
+                        );
+
+
+                    fileScanner
+                        .scanFile(
+                            file,
+                            true
+                        )
+
+                        .then(function(decodedText) {
+
+                            console.log(
+                                "QR image detected:",
+                                decodedText
+                            );
+
+
+                            processQRCode(
+                                decodedText
+                            );
+
+                        })
+
+                        .catch(function(error) {
+
+                            resultBox.className =
+                                "result-box error";
+
+
+                            resultBox.textContent =
+                                "❌ Could not read QR code from this image.";
+
+
+                            console.log(
+                                "Image scan error:",
+                                error
+                            );
+
+                        });
+
+                }
+            );
+
+
+        /*
+         * OTP INPUT
+         *
+         * Allow numbers only.
+         */
+
+        document
+            .getElementById("otpInput")
+            .addEventListener(
+                "input",
+                function() {
+
+                    this.value =
+                        this.value
+                            .replace(/\D/g, "")
+                            .slice(0, 6);
+
+                }
+            );
+
+
+        /*
+         * ENTER KEY = VERIFY OTP
+         */
+
+        document
+            .getElementById("otpInput")
+            .addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (event.key === "Enter") {
+
+                        verifyOTP();
+
+                    }
+
+                }
+            );
+
+
+        /*
+         * START CAMERA WHEN PAGE LOADS
+         */
+
+        window.addEventListener(
+            "load",
+            function() {
+
+                startCamera();
+
+            }
+        );
+
+
+        /*
+         * CLEAN UP WHEN LEAVING PAGE
+         */
+
+        window.addEventListener(
+            "beforeunload",
+            function() {
+
+                stopOtpTimer();
+
+
+                if (html5QrCode) {
+
+                    html5QrCode
+                        .stop()
+                        .catch(
+                            function() {}
+                        );
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>

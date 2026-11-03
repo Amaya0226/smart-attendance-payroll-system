@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Overtime | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #5b5ce2;
+            --primary-dark: #4849c8;
+            --background: #f5f6fb;
+            --surface: #ffffff;
+            --text: #20243a;
+            --muted: #737b91;
+            --border: #e5e8f0;
+            --danger: #dc3545;
+            --success: #16845b;
+            --shadow: 0 8px 30px rgba(31, 41, 85, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+
+        .topbar {
+            min-height: 72px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 12px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #eeeeff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 9px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .nav-links a:hover {
+            background: #f1f1ff;
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            background: #eeeeff;
+            color: var(--primary);
+        }
+
+        /* Main Container */
+
+        .page-container {
+            max-width: 1050px;
+            margin: 38px auto;
+            padding: 0 22px 40px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 9px;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* Form Card */
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 23px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: #eeeeff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .form-body {
+            padding: 28px;
+        }
+
+        /* Information */
+
+        .info-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            background: #f0f4ff;
+            border: 1px solid #dbe4ff;
+            border-radius: 11px;
+            padding: 16px;
+            margin-bottom: 29px;
+        }
+
+        .info-icon {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: #dfe7ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .info-content strong {
+            display: block;
+            font-size: 12px;
+            color: #34449a;
+            margin-bottom: 6px;
+        }
+
+        .info-content p {
+            color: #52618d;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .formula {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 11px;
+            background: #fff;
+            border: 1px solid #dbe4ff;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #34449a;
+        }
+
+        /* Form Sections */
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 750;
+            color: #343b56;
+        }
+
+        .section-title span {
+            width: 27px;
+            height: 27px;
+            border-radius: 8px;
+            background: #eeeeff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 21px 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #424961;
+        }
+
+        .required {
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text);
+            background: #fff;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input,
+        select {
+            height: 46px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #a4aabd;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 92, 226, .10);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .help-text {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+            margin-top: 7px;
+        }
+
+        /* Calculated Amount */
+
+        .amount-box {
+            background: #f0faf5;
+            border: 1px solid #ccebdc;
+            border-radius: 11px;
+            padding: 15px;
+        }
+
+        .amount-box label {
+            color: #16724f;
+        }
+
+        .amount-box input {
+            background: #fff;
+            border-color: #b8e1cc;
+            color: var(--success);
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        .amount-note {
+            color: #42846b;
+            font-size: 10px;
+            margin-top: 7px;
+        }
+
+        /* Error Message */
+
+        .error-message {
+            background: #fff0f0;
+            border: 1px solid #ffd4d4;
+            color: #b42332;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 23px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        /* Actions */
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .btn {
+            min-height: 43px;
+            padding: 0 19px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all .2s;
+        }
+
+        .cancel-btn {
+            background: #f1f2f7;
+            color: #50566d;
+            border: 1px solid var(--border);
+        }
+
+        .cancel-btn:hover {
+            background: #e8eaf2;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(91, 92, 226, .20);
+        }
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .page-footer {
+            text-align: center;
+            color: #9299aa;
+            font-size: 11px;
+            padding-top: 25px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 950px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 13px;
+                padding: 15px 22px;
+            }
+
+            .nav-links {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .page-container {
+                margin: 25px auto;
+                padding: 0 14px 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card-header {
+                padding: 19px;
+            }
+
+            .form-body {
+                padding: 20px 17px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .footer-note {
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="topbar">
+
+        <a href="/" class="brand">
+            <div class="brand-icon">✦</div>
+            <span>Smart Attendance & Payroll</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/employees">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/qr-attendance">QR Attendance</a>
+            <a href="/payroll">Payroll</a>
+            <a href="/payroll/report">Reports</a>
+            <a href="/payroll-rules">Payroll Rules</a>
+            <a href="/holidays">Holidays</a>
+            <a href="/overtime" class="active">Overtime</a>
+        </nav>
+
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-container">
+
+        <div class="breadcrumb">
+            <a href="/">Dashboard</a>
+            <span>/</span>
+            <a href="/overtime">Overtime Management</a>
+            <span>/</span>
+            <span>Add Overtime</span>
+        </div>
+
+        <div class="page-heading">
+            <h1>Add Overtime</h1>
+            <p>Record employee overtime hours and calculate overtime payments.</p>
+        </div>
+
+        <div class="form-card">
+
+            <div class="card-header">
+                <div class="header-icon">◷</div>
+                <div>
+                    <h2>Overtime Information</h2>
+                    <p>Enter the employee and overtime details below.</p>
+                </div>
+            </div>
+
+            <div class="form-body">
+
+                <!-- Error Message -->
+                <div th:if="${errorMessage != null}"
+                     class="error-message"
+                     th:text="${errorMessage}">
+                    Error message
+                </div>
+
+                <!-- Information -->
+                <div class="info-box">
+                    <div class="info-icon">i</div>
+                    <div class="info-content">
+                        <strong>Automatic Overtime Calculation</strong>
+                        <p>
+                            The overtime amount is automatically calculated
+                            when you enter the overtime hours and hourly rate.
+                        </p>
+                        <div class="formula">
+                            OT Hours × OT Rate = OT Amount
+                        </div>
+                    </div>
+                </div>
+
+                <form action="/overtime/save" method="post">
+
+                    <!-- Employee Information -->
+                    <section class="form-section">
+
+                        <div class="section-title">
+                            <span>01</span>
+                            Employee Information
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-group full-width">
+                                <label for="employeeId">
+                                    Select Employee
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select id="employeeId"
+                                        name="employeeId"
+                                        required>
+
+                                    <option value="">-- Select Employee --</option>
+
+                                    <option th:each="employee : ${employees}"
+                                            th:value="${employee.employeeId}"
+                                            th:text="${employee.employeeCode + ' - ' + employee.fullName}">
+                                        EMP001 - Employee Name
+                                    </option>
+
+                                </select>
+
+                                <div class="help-text">
+                                    Select the employee for whom overtime is being recorded.
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- Overtime Information -->
+                    <section class="form-section">
+
+                        <div class="section-title">
+                            <span>02</span>
+                            Overtime Details
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="otDate">
+                                    OT Date
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input type="date"
+                                       id="otDate"
+                                       name="otDate"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="otType">
+                                    OT Type
+                                    <span class="required">*</span>
+                                </label>
+
+                                <select id="otType"
+                                        name="otType"
+                                        required>
+
+                                    <option value="">-- Select OT Type --</option>
+                                    <option value="WEEKDAY">Weekday OT</option>
+                                    <option value="WEEKEND">Weekend OT</option>
+                                    <option value="HOLIDAY">Holiday OT</option>
+                                    <option value="OTHER">Other</option>
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="otHours">
+                                    OT Hours
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input type="number"
+                                       id="otHours"
+                                       name="otHours"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="Example: 3.00"
+                                       required
+                                       oninput="calculateAmount()">
+
+                                <div class="help-text">
+                                    Enter the total overtime hours.
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="otRate">
+                                    OT Rate (Rs.)
+                                    <span class="required">*</span>
+                                </label>
+
+                                <input type="number"
+                                       id="otRate"
+                                       name="otRate"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="Example: 1000.00"
+                                       required
+                                       oninput="calculateAmount()">
+
+                                <div class="help-text">
+                                    Enter the applicable overtime hourly rate.
+                                </div>
+                            </div>
+
+                            <div class="form-group amount-box">
+                                <label for="otAmount">
+                                    Calculated OT Amount (Rs.)
+                                </label>
+
+                                <input type="number"
+                                       id="otAmount"
+                                       name="otAmount"
+                                       step="0.01"
+                                       readonly>
+
+                                <div class="amount-note">
+                                    Automatically calculated from OT hours × OT rate.
+                                </div>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="description">
+                                    Description
+                                </label>
+
+                                <textarea id="description"
+                                          name="description"
+                                          placeholder="Enter additional details about the overtime..."></textarea>
+
+                                <div class="help-text">
+                                    Optional additional information about the overtime record.
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- Actions -->
+                    <div class="form-actions">
+
+                        <div class="footer-note">
+                            Please verify the overtime hours and rate before saving.
+                        </div>
+
+                        <div class="action-buttons">
+
+                            <a href="/overtime"
+                               class="btn cancel-btn">
+                                ← Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn save-btn">
+                                ✓ Save Overtime
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            © 2026 Smart Attendance & Payroll System. All rights reserved.
+        </footer>
+
+    </main>
+
+    <script>
+        function calculateAmount() {
+
+            const hours = parseFloat(
+                document.getElementById("otHours").value
+            ) || 0;
+
+            const rate = parseFloat(
+                document.getElementById("otRate").value
+            ) || 0;
+
+            const amount = hours * rate;
+
+            document.getElementById("otAmount").value =
+                amount.toFixed(2);
+        }
+    </script>
+
+</body>
+</html>

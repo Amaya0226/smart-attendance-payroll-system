@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Payslips | Smart Attendance &amp; Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --navy: #111c35;
+            --text: #172033;
+            --muted: #718096;
+            --border: #e7ebf3;
+            --background: #f5f7fc;
+            --white: #ffffff;
+            --success: #15803d;
+            --shadow: 0 8px 28px rgba(23, 32, 51, 0.055);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            min-height: 72px;
+            padding: 0 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(17, 28, 53, 0.12);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #818cf8, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .logout {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 9px;
+            transition: 0.2s;
+        }
+
+        .logout:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .container {
+            width: min(1080px, 92%);
+            margin: 38px auto;
+            min-height: calc(100vh - 180px);
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 19px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 27px;
+        }
+
+        h1 {
+            margin: 0 0 9px;
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .back {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 11px 15px;
+            border: 1px solid #dfe3fb;
+            border-radius: 9px;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .back:hover {
+            background: #eef0ff;
+            border-color: #c7ccff;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 28px 0 17px;
+        }
+
+        .section-heading h2 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .section-description {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 19px;
+        }
+
+        .slip {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 23px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slip:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 13px 32px rgba(23, 32, 51, 0.09);
+        }
+
+        .slip::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #818cf8);
+        }
+
+        .slip-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 19px;
+        }
+
+        .month {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            overflow-wrap: anywhere;
+        }
+
+        .reference {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 7px;
+        }
+
+        .document-icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #eef0ff;
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 20px;
+        }
+
+        .salary-box {
+            background: #f7f8ff;
+            border: 1px solid #edf0ff;
+            border-radius: 12px;
+            padding: 17px;
+            margin-bottom: 17px;
+        }
+
+        .net-label {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .net {
+            font-size: clamp(21px, 4vw, 26px);
+            font-weight: 800;
+            color: #273777;
+            margin-top: 8px;
+            overflow-wrap: anywhere;
+            letter-spacing: -0.8px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 20px;
+            padding: 7px 11px;
+            font-size: 10px;
+            font-weight: 800;
+            background: #eef2f7;
+            color: #475569;
+            overflow-wrap: anywhere;
+        }
+
+        .CALCULATED {
+            background: #fff7df;
+            color: #946200;
+        }
+
+        .APPROVED {
+            background: #e8f1ff;
+            color: #2455a6;
+        }
+
+        .PAID {
+            background: #e5f8ee;
+            color: #167347;
+        }
+
+        .DRAFT {
+            background: #f1f2f5;
+            color: #596579;
+        }
+
+        .view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+
+        .view:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .empty {
+            background: white;
+            text-align: center;
+            padding: 55px 20px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            background: #eef0ff;
+            color: var(--primary);
+            font-size: 29px;
+        }
+
+        .empty h3 {
+            margin: 0 0 9px;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .empty p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .information {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 15px 17px;
+            margin-top: 27px;
+            background: #eef2ff;
+            border: 1px solid #dfe5ff;
+            border-radius: 11px;
+            color: #39468b;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .information-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px 15px;
+            color: #8993a5;
+            font-size: 10px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 0 4%;
+                min-height: 65px;
+            }
+
+            .brand {
+                font-size: 12px;
+            }
+
+            .container {
+                width: 92%;
+                margin: 27px auto;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            .heading {
+                align-items: flex-start;
+            }
+
+            .back {
+                width: 100%;
+                text-align: center;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .slip {
+                padding: 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-icon">✓</div>
+        <span>Smart Attendance &amp; Payroll</span>
+    </div>
+
+    <a class="logout" th:href="@{/logout}">Logout ↗</a>
+</header>
+
+<main class="container">
+
+    <div class="breadcrumb">
+        <a th:href="@{/employee/dashboard}">Dashboard</a>
+        <span> / My Payslips</span>
+    </div>
+
+    <div class="heading">
+        <div>
+            <h1>My Payslips</h1>
+            <div class="subtitle">
+                View and access your monthly salary statements.
+                Your saved payroll records are displayed here.
+            </div>
+        </div>
+
+        <a class="back" th:href="@{/employee/dashboard}">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <div class="section-heading"
+         th:if="${not #lists.isEmpty(payrollList)}">
+        <h2>Salary Statements</h2>
+        <span class="section-description">Your monthly payroll records</span>
+    </div>
+
+    <div class="grid" th:if="${not #lists.isEmpty(payrollList)}">
+
+        <article class="slip" th:each="p : ${payrollList}">
+
+            <div class="slip-top">
+                <div>
+                    <div class="month"
+                         th:text="${#temporals.format(p.payrollMonth, 'MMMM yyyy')}">
+                        October 2026
+                    </div>
+
+                    <div class="reference">
+                        Payroll Reference #
+                        <span th:text="${p.payrollId}">1</span>
+                    </div>
+                </div>
+
+                <div class="document-icon">▤</div>
+            </div>
+
+            <div class="salary-box">
+                <div class="net-label">NET SALARY</div>
+
+                <div class="net"
+                     th:text="${'Rs. ' + #numbers.formatDecimal(p.netSalary, 1, 2)}">
+                    Rs. 80,000.00
+                </div>
+            </div>
+
+            <div class="status-row">
+                <span class="status-label">Payroll Status</span>
+
+                <span class="status"
+                      th:classappend="${p.status != null ? ' ' + p.status.name() : ''}"
+                      th:text="${p.status}">
+                    CALCULATED
+                </span>
+            </div>
+
+            <a class="view"
+               th:href="@{/employee/payslips/{id}(id=${p.payrollId})}">
+                View Payslip <span>→</span>
+            </a>
+
+        </article>
+
+    </div>
+
+    <div class="empty" th:if="${#lists.isEmpty(payrollList)}">
+
+        <div class="empty-icon">▤</div>
+
+        <h3>No Payslips Available</h3>
+
+        <p>
+            Your payslips will be available here after payroll records are created.
+            Please contact the administration if you need assistance.
+        </p>
+
+    </div>
+
+    <div class="information">
+        <span class="information-icon">ⓘ</span>
+        <span>
+            Your payslip displays the saved payroll information.
+            For salary corrections or payment-related queries,
+            please contact the administration.
+        </span>
+    </div>
+
+</main>
+
+<footer>
+    Smart Attendance &amp; Payroll System © 2026
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1008 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Payroll | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f5f6fc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e8eaf2;
+            padding: 15px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .brand p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #64748b;
+            text-decoration: none;
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #f1f0ff;
+            color: #4f46e5;
+        }
+
+        .nav-links a.active {
+            background: #eeedff;
+            color: #4f46e5;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1050px;
+            margin: 35px auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            text-decoration: none;
+            color: #64748b;
+        }
+
+        .breadcrumb a:hover {
+            color: #4f46e5;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            color: #172554;
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.7px;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border: 1px solid #eaecf3;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .error {
+            background: #fff1f2;
+            color: #be123c;
+            border: 1px solid #fecdd3;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eef0f5;
+        }
+
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: #eeedff;
+            color: #5b4de3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .section-heading h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .section-heading p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 21px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #dfe3ed;
+            border-radius: 9px;
+            font-size: 13px;
+            color: #334155;
+            background: #ffffff;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:hover,
+        select:hover {
+            border-color: #b8b5f5;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #6961e8;
+            box-shadow: 0 0 0 3px rgba(99, 91, 220, 0.10);
+        }
+
+        input[readonly] {
+            background: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .overtime-field {
+            background: #faf5ff !important;
+            color: #7e22ce !important;
+            font-weight: 700;
+            border-color: #e9d5ff;
+        }
+
+        .attendance-box {
+            background: #f8faff;
+            border: 1px solid #e3e8f5;
+            border-radius: 13px;
+            padding: 22px;
+            margin-top: 28px;
+        }
+
+        .attendance-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .attendance-heading h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .attendance-heading p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .attendance-item {
+            background: #ffffff;
+            border: 1px solid #e8ebf3;
+            padding: 17px 10px;
+            border-radius: 11px;
+            text-align: center;
+        }
+
+        .attendance-item span {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 9px;
+        }
+
+        .attendance-item strong {
+            font-size: 23px;
+            font-weight: 800;
+            color: #334155;
+        }
+
+        .attendance-item:nth-child(1) strong {
+            color: #4f46e5;
+        }
+
+        .attendance-item:nth-child(2) strong {
+            color: #059669;
+        }
+
+        .attendance-item:nth-child(3) strong {
+            color: #e11d48;
+        }
+
+        .attendance-item:nth-child(4) strong {
+            color: #d97706;
+        }
+
+        .net-salary {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 19px;
+            border-radius: 12px;
+        }
+
+        .net-salary label {
+            color: #15803d;
+            font-size: 13px;
+        }
+
+        .net-salary input {
+            background: #ffffff;
+            border-color: #bbf7d0;
+            color: #15803d;
+            font-weight: 800;
+            font-size: 19px;
+            padding: 14px;
+        }
+
+        .info-box {
+            margin-top: 23px;
+            padding: 15px 17px;
+            background: #f0f5ff;
+            color: #1d4ed8;
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.7;
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+        }
+
+        .info-icon {
+            width: 25px;
+            height: 25px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: #dbeafe;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+        }
+
+        .loading-message {
+            margin-top: 14px;
+            color: #4f46e5;
+            font-size: 12px;
+            font-weight: 600;
+            min-height: 18px;
+        }
+
+        .buttons {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid #eef0f5;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 21px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #5146df, #7045d9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(91, 70, 220, 0.2);
+        }
+
+        .btn-update:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(91, 70, 220, 0.25);
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px 15px;
+            color: #a0a8b8;
+            font-size: 11px;
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                padding: 14px 4%;
+            }
+
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 3px;
+            }
+
+            .nav-links a {
+                white-space: nowrap;
+            }
+
+            .container {
+                margin: 25px auto;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .attendance-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+            .brand h2 {
+                font-size: 14px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 17px;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .attendance-box {
+                padding: 15px;
+            }
+
+            .attendance-item {
+                padding: 14px 7px;
+            }
+
+            .attendance-item strong {
+                font-size: 20px;
+            }
+
+            .buttons {
+                flex-direction: column-reverse;
+            }
+
+            .buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <div class="brand">
+        <div class="brand-icon">S</div>
+        <div>
+            <h2>Smart Attendance &amp; Payroll</h2>
+            <p>Administration Management Portal</p>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a th:href="@{/}">Dashboard</a>
+        <a th:href="@{/employees}">Employees</a>
+        <a th:href="@{/attendance}">Attendance</a>
+        <a th:href="@{/payroll}" class="active">Payroll</a>
+        <a th:href="@{/holidays}">Holidays</a>
+        <a th:href="@{/overtime}">Overtime</a>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="breadcrumb">
+        <a th:href="@{/}">Dashboard</a>
+        <span>/</span>
+        <a th:href="@{/payroll}">Payroll</a>
+        <span>/</span>
+        <span>Edit Payroll</span>
+    </div>
+
+    <div class="page-header">
+        <h1>Edit Payroll</h1>
+        <p>Review payroll information, attendance details and salary components.</p>
+    </div>
+
+    <div class="card">
+
+        <div class="error"
+             th:if="${errorMessage}"
+             th:text="${errorMessage}">
+        </div>
+
+        <form th:action="@{/payroll/update}"
+              th:object="${payroll}"
+              method="post"
+              id="payrollForm">
+
+            <input type="hidden" th:field="*{payrollId}">
+
+            <div class="section-heading">
+                <div class="section-icon">👤</div>
+                <div>
+                    <h3>Employee & Payroll Details</h3>
+                    <p>Select the employee and payroll period.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="employeeId">Employee</label>
+
+                    <select id="employeeId"
+                            th:field="*{employeeId}"
+                            required>
+
+                        <option value="">Select Employee</option>
+
+                        <option th:each="employee : ${employees}"
+                                th:value="${employee.employeeId}"
+                                th:text="${employee.employeeCode + ' - ' + employee.fullName}">
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="payrollMonth">Payroll Month</label>
+
+                    <input type="date"
+                           id="payrollMonth"
+                           name="payrollMonth"
+                           th:value="${#temporals.format(payroll.payrollMonth, 'yyyy-MM-dd')}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="basicSalary">Basic Salary (Rs.)</label>
+
+                    <input type="number"
+                           id="basicSalary"
+                           th:field="*{basicSalary}"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="allowances">Allowances (Rs.)</label>
+
+                    <input type="number"
+                           id="allowances"
+                           th:field="*{allowances}"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+            </div>
+
+            <div class="section-heading">
+                <div class="section-icon">📊</div>
+                <div>
+                    <h3>Attendance Summary</h3>
+                    <p>Attendance values for the selected payroll period.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="workingDays">Working Days</label>
+
+                    <input type="number"
+                           id="workingDays"
+                           th:field="*{workingDays}"
+                           min="0"
+                           readonly
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="presentDays">Present Days</label>
+
+                    <input type="number"
+                           id="presentDays"
+                           th:field="*{presentDays}"
+                           min="0"
+                           readonly
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="absentDays">Absent Days</label>
+
+                    <input type="number"
+                           id="absentDays"
+                           th:field="*{absentDays}"
+                           min="0"
+                           readonly
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="leaveDays">Leave Days</label>
+
+                    <input type="number"
+                           id="leaveDays"
+                           th:field="*{leaveDays}"
+                           min="0"
+                           readonly
+                           required>
+                </div>
+
+            </div>
+
+            <div class="attendance-box">
+
+                <div class="attendance-heading">
+                    <div class="section-icon">📅</div>
+                    <div>
+                        <h3>Attendance Overview</h3>
+                        <p>Summary of attendance for this payroll.</p>
+                    </div>
+                </div>
+
+                <div class="attendance-grid">
+
+                    <div class="attendance-item">
+                        <span>Working Days</span>
+                        <strong id="workingDaysDisplay"
+                                th:text="${payroll.workingDays}">0</strong>
+                    </div>
+
+                    <div class="attendance-item">
+                        <span>Present Days</span>
+                        <strong id="presentDaysDisplay"
+                                th:text="${payroll.presentDays}">0</strong>
+                    </div>
+
+                    <div class="attendance-item">
+                        <span>Absent Days</span>
+                        <strong id="absentDaysDisplay"
+                                th:text="${payroll.absentDays}">0</strong>
+                    </div>
+
+                    <div class="attendance-item">
+                        <span>Leave Days</span>
+                        <strong id="leaveDaysDisplay"
+                                th:text="${payroll.leaveDays}">0</strong>
+                    </div>
+
+                </div>
+
+                <div id="attendanceMessage"
+                     class="loading-message"
+                     role="status"
+                     aria-live="polite">
+                </div>
+
+            </div>
+
+            <div class="section-heading">
+                <div class="section-icon">💰</div>
+                <div>
+                    <h3>Salary Calculation</h3>
+                    <p>Review overtime, deductions, tax and final salary.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="overtime">Overtime (Rs.)</label>
+
+                    <input type="number"
+                           id="overtime"
+                           th:field="*{overtime}"
+                           class="overtime-field"
+                           min="0"
+                           step="0.01"
+                           readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="deductions">Deductions (Rs.)</label>
+
+                    <input type="number"
+                           id="deductions"
+                           th:field="*{deductions}"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tax">Tax (Rs.)</label>
+
+                    <input type="number"
+                           id="tax"
+                           th:field="*{tax}"
+                           min="0"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="form-group full net-salary">
+                    <label for="netSalary">Net Salary (Rs.)</label>
+
+                    <input type="number"
+                           id="netSalary"
+                           th:field="*{netSalary}"
+                           step="0.01"
+                           readonly>
+                </div>
+
+            </div>
+
+            <div class="info-box">
+                <div class="info-icon">i</div>
+                <div>
+                    <strong>Payroll Information</strong><br>
+                    Attendance and overtime information are loaded for the selected
+                    employee and payroll month. Missing attendance records should not
+                    automatically be treated as confirmed absences. Review the displayed
+                    information before updating the payroll.
+                </div>
+            </div>
+
+            <div class="buttons">
+
+                <button type="submit" class="btn btn-update">
+                    ✓ Update Payroll
+                </button>
+
+                <a th:href="@{/payroll}" class="btn btn-cancel">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<div class="footer">
+    Smart Attendance &amp; Payroll System © 2026
+</div>
+
+<script>
+    function getPayrollMonth() {
+        const dateValue =
+            document.getElementById("payrollMonth").value;
+
+        return dateValue ? dateValue.substring(0, 7) : "";
+    }
+
+    function updateAttendanceDisplay() {
+        document.getElementById("workingDaysDisplay").textContent =
+            document.getElementById("workingDays").value || 0;
+
+        document.getElementById("presentDaysDisplay").textContent =
+            document.getElementById("presentDays").value || 0;
+
+        document.getElementById("absentDaysDisplay").textContent =
+            document.getElementById("absentDays").value || 0;
+
+        document.getElementById("leaveDaysDisplay").textContent =
+            document.getElementById("leaveDays").value || 0;
+    }
+
+    function calculateNetSalary() {
+        const basicSalary =
+            parseFloat(document.getElementById("basicSalary").value) || 0;
+
+        const allowances =
+            parseFloat(document.getElementById("allowances").value) || 0;
+
+        const overtime =
+            parseFloat(document.getElementById("overtime").value) || 0;
+
+        const deductions =
+            parseFloat(document.getElementById("deductions").value) || 0;
+
+        const tax =
+            parseFloat(document.getElementById("tax").value) || 0;
+
+        const netSalary =
+            basicSalary + allowances + overtime - deductions - tax;
+
+        document.getElementById("netSalary").value =
+            Math.max(netSalary, 0).toFixed(2);
+    }
+
+    async function loadAttendanceData() {
+        const employeeId =
+            document.getElementById("employeeId").value;
+
+        const payrollMonth = getPayrollMonth();
+
+        const message =
+            document.getElementById("attendanceMessage");
+
+        if (!employeeId || !payrollMonth) {
+            message.textContent =
+                "Select an employee and payroll month to load attendance.";
+            return;
+        }
+
+        message.textContent = "Loading attendance data...";
+
+        try {
+            const url =
+                "/payroll/attendance-summary/" +
+                encodeURIComponent(employeeId) +
+                "?month=" +
+                encodeURIComponent(payrollMonth);
+
+            const response = await fetch(url, {
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "Attendance request failed: HTTP " + response.status
+                );
+            }
+
+            const data = await response.json();
+
+            if (
+                typeof data.workingDays === "undefined" ||
+                typeof data.presentDays === "undefined" ||
+                typeof data.absentDays === "undefined" ||
+                typeof data.leaveDays === "undefined"
+            ) {
+                throw new Error("Attendance response is missing required fields.");
+            }
+
+            document.getElementById("workingDays").value =
+                data.workingDays;
+
+            document.getElementById("presentDays").value =
+                data.presentDays;
+
+            document.getElementById("absentDays").value =
+                data.absentDays;
+
+            document.getElementById("leaveDays").value =
+                data.leaveDays;
+
+            updateAttendanceDisplay();
+
+            message.textContent =
+                "Attendance data loaded successfully.";
+
+        } catch (error) {
+            console.error("Attendance loading error:", error);
+
+            message.textContent =
+                "Could not load attendance. Check the attendance-summary endpoint.";
+        }
+    }
+
+    async function loadOvertimeData() {
+        const employeeId =
+            document.getElementById("employeeId").value;
+
+        const payrollMonth = getPayrollMonth();
+
+        const overtimeField =
+            document.getElementById("overtime");
+
+        if (!employeeId || !payrollMonth) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                "/payroll/overtime-data/" +
+                encodeURIComponent(employeeId) +
+                "?month=" +
+                encodeURIComponent(payrollMonth),
+                {
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Overtime request failed: HTTP " + response.status
+                );
+            }
+
+            const data = await response.json();
+
+            // Supports either a numeric response or { overtime: amount }.
+            const overtimeAmount =
+                typeof data === "number"
+                    ? data
+                    : Number(data.overtime ?? data.totalOvertime ?? 0);
+
+            overtimeField.value =
+                (Number.isFinite(overtimeAmount) ? overtimeAmount : 0)
+                    .toFixed(2);
+
+            calculateNetSalary();
+
+        } catch (error) {
+            console.error("Overtime loading error:", error);
+
+            document.getElementById("attendanceMessage").textContent =
+                "Attendance loaded, but overtime could not be loaded. Check the overtime endpoint.";
+        }
+    }
+
+    async function loadPayrollData() {
+        await Promise.all([
+            loadAttendanceData(),
+            loadOvertimeData()
+        ]);
+    }
+
+    document.getElementById("employeeId")
+        .addEventListener("change", loadPayrollData);
+
+    document.getElementById("payrollMonth")
+        .addEventListener("change", loadPayrollData);
+
+    document.querySelectorAll(
+        "#basicSalary, #allowances, #deductions, #tax"
+    ).forEach(function (input) {
+        input.addEventListener("input", calculateNetSalary);
+    });
+
+    window.addEventListener("DOMContentLoaded", function () {
+        updateAttendanceDisplay();
+        loadPayrollData();
+    });
+</script>
+
+</body>
+</html>

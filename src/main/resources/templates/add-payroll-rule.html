@@ -1,0 +1,652 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Add Payroll Rule | Smart Attendance &amp; Payroll System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary: #6256e8;
+            --primary-dark: #5044cf;
+            --primary-soft: #f0efff;
+            --navy: #172033;
+            --text: #344054;
+            --muted: #8490a5;
+            --border: #e7eaf1;
+            --background: #f5f6fb;
+            --danger: #b42318;
+            --shadow: 0 8px 30px rgba(24, 34, 68, .055);
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background);
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        /* NAVIGATION */
+
+        .navbar {
+            min-height: 76px;
+            background: #fff;
+            padding: 14px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 3px 15px rgba(20, 30, 60, .035);
+        }
+
+        .brand {
+            color: var(--navy);
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+            white-space: nowrap;
+        }
+
+        .brand::before {
+            content: "SA";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            margin-right: 10px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7165ef, #5044cf);
+            color: white;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #667085;
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: .2s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .nav-links a.active {
+            font-weight: 700;
+        }
+
+        /* PAGE */
+
+        .container {
+            width: 92%;
+            max-width: 850px;
+            margin: 35px auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .eyebrow {
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            margin-bottom: 9px;
+        }
+
+        .page-header h1 {
+            color: var(--navy);
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -.7px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: white;
+            color: #475467;
+            border: 1px solid var(--border);
+            padding: 11px 16px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: #f8f7ff;
+            border-color: #c7c2ff;
+            color: var(--primary);
+        }
+
+        /* CARD */
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding-bottom: 21px;
+            margin-bottom: 23px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .card-heading h2 {
+            color: var(--navy);
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .card-heading p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* FORM */
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            color: #344054;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .required {
+            color: #dc2626;
+            margin-left: 2px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 13px;
+            border: 1px solid #dfe3ec;
+            border-radius: 9px;
+            outline: none;
+            background: white;
+            color: #344054;
+            font-size: 13px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+            line-height: 1.6;
+        }
+
+        input:hover,
+        select:hover,
+        textarea:hover {
+            border-color: #b9b4f5;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(98, 86, 232, .11);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #a0a8b7;
+        }
+
+        .help-text {
+            margin-top: 7px;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #98a2b3;
+        }
+
+        /* RULE TYPE INFO */
+
+        .rule-info {
+            padding: 17px 19px;
+            margin: 5px 0 22px;
+            border-radius: 11px;
+            background: #f5f5ff;
+            border: 1px solid #e2e0ff;
+            border-left: 4px solid var(--primary);
+        }
+
+        .rule-info h3 {
+            color: #41418a;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .rule-info p {
+            color: #656b98;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        /* ERROR */
+
+        .error-message {
+            background: #fff1f0;
+            color: #b42318;
+            border: 1px solid #fecdca;
+            border-left: 4px solid #d92d20;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        /* BUTTONS */
+
+        .button-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 11px;
+            padding-top: 23px;
+            margin-top: 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 21px;
+            border-radius: 9px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            transition: .2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7165ef, #5145cf);
+            color: white;
+            min-width: 165px;
+            box-shadow: 0 5px 13px rgba(98, 86, 232, .2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #6256e8, #4338b5);
+            box-shadow: 0 7px 17px rgba(98, 86, 232, .27);
+        }
+
+        .btn-secondary {
+            background: #f2f4f7;
+            color: #475467;
+        }
+
+        .btn-secondary:hover {
+            background: #e4e7ec;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #98a2b3;
+            font-size: 10px;
+            line-height: 1.8;
+            margin: 20px 0 30px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 800px) {
+            .navbar {
+                padding: 15px 4%;
+            }
+
+            .nav-links {
+                width: 100%;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .card {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .nav-links {
+                gap: 4px;
+            }
+
+            .nav-links a {
+                padding: 8px 9px;
+                font-size: 11px;
+            }
+
+            .page-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .page-header h1 {
+                font-size: 24px;
+            }
+
+            .back-btn {
+                align-self: flex-start;
+            }
+
+            .card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .button-row {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .button-row .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="brand">
+        Smart Attendance &amp; Payroll System
+    </div>
+
+    <nav class="nav-links" aria-label="Main navigation">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/employees">Employees</a>
+        <a href="/attendance">Attendance</a>
+        <a href="/payroll">Payroll</a>
+        <a href="/payroll-rules" class="active">Payroll Rules</a>
+    </nav>
+
+</header>
+
+<main class="container">
+
+    <div class="page-header">
+
+        <div>
+            <div class="eyebrow">Administration / Payroll Settings</div>
+            <h1>Add Payroll Rule</h1>
+            <p>
+                Create a new payroll calculation rule to manage
+                allowances, deductions and employee tax.
+            </p>
+        </div>
+
+        <a href="/payroll-rules" class="back-btn">
+            <span aria-hidden="true">←</span>
+            Back to Payroll Rules
+        </a>
+
+    </div>
+
+    <section class="card">
+
+        <div class="card-heading">
+            <div class="card-icon" aria-hidden="true">⚙</div>
+
+            <div>
+                <h2>Payroll Rule Information</h2>
+                <p>Enter the details below to configure a payroll rule.</p>
+            </div>
+        </div>
+
+        <div
+            th:if="${errorMessage}"
+            class="error-message"
+            th:text="${errorMessage}"
+            role="alert">
+        </div>
+
+        <form
+            th:action="@{/payroll-rules/save}"
+            th:object="${rule}"
+            method="post">
+
+            <div class="form-group">
+
+                <label for="ruleName">
+                    Rule Name <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="ruleName"
+                    th:field="*{ruleName}"
+                    placeholder="Example: Employee Tax"
+                    required>
+
+                <div class="help-text">
+                    Provide a clear and recognizable name for this rule.
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="ruleType">
+                    Rule Type <span class="required">*</span>
+                </label>
+
+                <select
+                    id="ruleType"
+                    th:field="*{ruleType}"
+                    required>
+
+                    <option value="">
+                        -- Select Rule Type --
+                    </option>
+
+                    <option value="TAX">TAX</option>
+                    <option value="ALLOWANCE">ALLOWANCE</option>
+                    <option value="DEDUCTION">DEDUCTION</option>
+
+                </select>
+
+                <div class="help-text">
+                    Select the category of the payroll rule.
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="ruleValue">
+                    Rule Value <span class="required">*</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="ruleValue"
+                    th:field="*{ruleValue}"
+                    step="0.01"
+                    min="0"
+                    placeholder="Example: 5.00"
+                    required>
+
+                <div class="help-text">
+                    Enter the value used by this payroll rule.
+                </div>
+
+            </div>
+
+            <div class="rule-info">
+
+                <h3>Rule Configuration</h3>
+
+                <p>
+                    Choose the correct rule category and enter its
+                    configured value. The active payroll rules are used
+                    by the payroll calculation process.
+                </p>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    th:field="*{description}"
+                    placeholder="Enter a description for this payroll rule."></textarea>
+
+                <div class="help-text">
+                    Optional information explaining the purpose of this rule.
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="status">
+                    Status <span class="required">*</span>
+                </label>
+
+                <select
+                    id="status"
+                    th:field="*{status}"
+                    required>
+
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="INACTIVE">INACTIVE</option>
+
+                </select>
+
+                <div class="help-text">
+                    Only active rules are considered by the applicable
+                    payroll calculation logic.
+                </div>
+
+            </div>
+
+            <div class="button-row">
+
+                <a
+                    href="/payroll-rules"
+                    class="btn btn-secondary">
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Save Payroll Rule
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <p class="footer-note">
+        Smart Attendance &amp; Payroll System · Payroll Configuration
+    </p>
+
+</main>
+
+</body>
+</html>

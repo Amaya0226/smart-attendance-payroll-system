@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Monthly Payroll Report | Smart Attendance &amp; Payroll</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --primary: #17365d;
+            --primary-light: #1f5fae;
+            --success: #198754;
+            --danger: #a12626;
+            --warning: #92400e;
+            --text: #243247;
+            --muted: #667085;
+            --border: #e4e8ef;
+            --background: #f3f6fb;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 25px;
+            background: var(--background);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            line-height: 1.55;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .panel,
+        .summary-card {
+            min-width: 0;
+            background: var(--white);
+            border: 1px solid #edf0f5;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .panel { margin-bottom: 20px; }
+        .filter-panel { margin-bottom: 18px; }
+
+        .filter-form {
+            display: flex;
+            align-items: end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .form-group { min-width: 220px; }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        input[type="month"] {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px;
+            border: 1px solid #ccd3df;
+            border-radius: 6px;
+            font-size: 15px;
+            background: white;
+        }
+
+        input[type="month"]:focus {
+            outline: 2px solid #b7d4f7;
+            border-color: var(--primary-light);
+        }
+
+        .button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 42px;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            color: white;
+            background: var(--primary-light);
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: opacity 0.2s ease;
+        }
+
+        .button:hover { opacity: 0.88; }
+
+        .button:focus-visible {
+            outline: 3px solid #b7d4f7;
+            outline-offset: 2px;
+        }
+
+        .print-button { background: var(--success); }
+        .back-button { background: #475467; }
+
+        .message {
+            margin: 14px 0;
+            padding: 14px 16px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .message-title {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .error {
+            background: #fff0f0;
+            border-color: #fecaca;
+            color: var(--danger);
+        }
+
+        .warning {
+            background: #fffbeb;
+            border-color: #fcd34d;
+            color: var(--warning);
+        }
+
+        .info {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .success {
+            background: #ecfdf3;
+            border-color: #a7f3d0;
+            color: #166534;
+        }
+
+        .message p { margin: 6px 0; }
+
+        .warning ul,
+        .info ul {
+            margin: 8px 0;
+            padding-left: 22px;
+        }
+
+        .warning li,
+        .info li { margin: 6px 0; }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+            gap: 15px;
+            margin: 22px 0;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: normal;
+        }
+
+        .summary-card p {
+            margin: 0;
+            color: var(--primary);
+            font-size: 22px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card.net-card { border-top: 4px solid var(--success); }
+
+        .section-heading {
+            margin: 0 0 8px;
+            color: var(--primary);
+            font-size: 21px;
+        }
+
+        .section-description {
+            margin: 0 0 16px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tbody tr:nth-child(even) { background: #f8fafc; }
+        tbody tr:hover { background: #eef5ff; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #e9eef5;
+            color: #344054;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-paid,
+        .status-match {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-approved {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-calculated {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-draft {
+            background: #f2f4f7;
+            color: #475467;
+        }
+
+        .status-different {
+            background: #fff1f0;
+            color: #a12626;
+        }
+
+        .empty-message {
+            padding: 25px;
+            text-align: center;
+            color: var(--muted);
+            white-space: normal;
+        }
+
+        .report-note {
+            margin-top: 15px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .financial-note {
+            padding: 12px 14px;
+            border-radius: 7px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: #475467;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+
+            .header { align-items: stretch; }
+            .header h1 { font-size: 23px; }
+            .header-actions { width: 100%; }
+
+            .header-actions .button { flex: 1; }
+
+            .panel,
+            .summary-card { padding: 14px; }
+
+            .filter-form {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .form-group {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .filter-form .button { width: 100%; }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .summary-card p { font-size: 18px; }
+            .section-heading { font-size: 18px; }
+
+            th, td { padding: 10px 8px; }
+        }
+
+        @media print {
+            @page {
+                size: landscape;
+                margin: 10mm;
+            }
+
+            body {
+                padding: 0;
+                background: white;
+                color: black;
+                font-size: 10px;
+            }
+
+            .container { max-width: none; }
+
+            .no-print,
+            .filter-panel { display: none !important; }
+
+            .panel,
+            .summary-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+                margin: 12px 0;
+            }
+
+            .summary-card { padding: 10px; }
+            .summary-card h3 { font-size: 10px; }
+            .summary-card p { font-size: 13px; }
+
+            .table-wrapper {
+                overflow: visible;
+                border: none;
+            }
+
+            table {
+                width: 100%;
+                font-size: 8px;
+            }
+
+            th, td {
+                padding: 5px 4px;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            th {
+                background: #e5e5e5 !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .message { break-inside: avoid; }
+            .footer { margin-top: 12px; }
+            .section-heading { font-size: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header class="header">
+        <div>
+            <h1>Monthly Payroll Report</h1>
+            <p class="subtitle">Smart Attendance &amp; Payroll System</p>
+        </div>
+
+        <div class="header-actions no-print">
+            <button type="button"
+                    class="button print-button"
+                    id="printReportButton">
+                Print / Save as PDF
+            </button>
+
+            <a th:href="@{/payroll}" class="button back-button">
+                Back to Payroll
+            </a>
+        </div>
+    </header>
+
+    <!-- Month Selection -->
+    <section class="panel filter-panel no-print">
+        <form method="get"
+              th:action="@{/payroll/report}"
+              class="filter-form"
+              id="reportFilterForm">
+
+            <div class="form-group">
+                <label for="month">Select Payroll Month</label>
+                <input type="month"
+                       id="month"
+                       name="month"
+                       th:value="${selectedMonth}"
+                       required>
+            </div>
+
+            <button type="submit" class="button">View Report</button>
+        </form>
+    </section>
+
+    <!-- Validation Error -->
+    <div class="message error"
+         role="alert"
+         th:if="${errorMessage != null}">
+        <span class="message-title">Validation Error</span>
+        <span th:text="${errorMessage}">
+            Please check the selected payroll month.
+        </span>
+    </div>
+
+    <!-- No Records Information -->
+    <div class="message info"
+         role="status"
+         th:if="${infoMessage != null}">
+        <span class="message-title">Report Information</span>
+        <span th:text="${infoMessage}">
+            No payroll records are available.
+        </span>
+    </div>
+
+    <!-- Validation Warnings -->
+    <section class="message warning"
+             role="alert"
+             th:if="${hasValidationWarnings}">
+
+        <span class="message-title">
+            Payroll Report Validation Warnings
+        </span>
+
+        <p>
+            Please review the messages below. Attendance completeness
+            warnings are distinguished from financial and consistency
+            errors that prevent the report from being marked ready for review.
+        </p>
+
+        <ul>
+            <li th:each="warning : ${validationWarnings}"
+                th:text="${warning}">
+                Validation warning
+            </li>
+        </ul>
+
+        <p>
+            These warnings do not automatically change stored payroll
+            amounts, attendance records, or payroll statuses.
+        </p>
+    </section>
+
+    <!-- Report Ready for Review -->
+    <div class="message success"
+         role="status"
+         th:if="${reportCanBeReviewed}">
+
+        <span class="message-title">Report Ready for Review</span>
+
+        The report is available for review. Please read any attendance
+        completeness warnings shown above before making payroll decisions.
+        This report does not approve, pay, or recalculate payroll records.
+    </div>
+
+    <!-- Informational Snapshot Differences -->
+    <section class="message info"
+             role="status"
+             th:if="${attendanceInformation != null
+                     and !#lists.isEmpty(attendanceInformation)}">
+
+        <span class="message-title">
+            Attendance Snapshot Information
+        </span>
+
+        <ul>
+            <li th:each="information : ${attendanceInformation}"
+                th:text="${information}">
+                Attendance information
+            </li>
+        </ul>
+
+        <p>
+            A difference between saved and current attendance counts
+            does not itself change the salary already stored in payroll.
+        </p>
+    </section>
+
+    <!-- Financial Summary -->
+    <section class="summary-grid">
+
+        <div class="summary-card">
+            <h3>Payroll Records</h3>
+            <p th:text="${totalEmployees}">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Basic Salary (Rs.)</h3>
+            <p th:text="${#numbers.formatDecimal(totalBasic, 1, 2)}">
+                0.00
+            </p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Allowances (Rs.)</h3>
+            <p th:text="${#numbers.formatDecimal(totalAllowances, 1, 2)}">
+                0.00
+            </p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Overtime (Rs.)</h3>
+            <p th:text="${#numbers.formatDecimal(totalOvertime, 1, 2)}">
+                0.00
+            </p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Deductions (Rs.)</h3>
+            <p th:text="${#numbers.formatDecimal(totalDeductions, 1, 2)}">
+                0.00
+            </p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Tax (Rs.)</h3>
+            <p th:text="${#numbers.formatDecimal(totalTax, 1, 2)}">
+                0.00
+            </p>
+        </div>
+
+        <div class="summary-card net-card">
+            <h3>Total Net Salary (Rs.)</h3>
+            <p th:text="${#numbers.formatDecimal(totalNetSalary, 1, 2)}">
+                0.00
+            </p>
+        </div>
+
+    </section>
+
+    <!-- Payroll Details -->
+    <section class="panel">
+
+        <h2 class="section-heading">
+            Payroll Details —
+            <span th:text="${monthLabel}">2026-10</span>
+        </h2>
+
+        <p class="section-description">
+            The financial amounts and attendance counts below are
+            read from the saved payroll records.
+        </p>
+
+        <div class="financial-note">
+            <strong>Financial integrity:</strong>
+            This report displays stored payroll amounts. Opening,
+            filtering, or printing this page does not recalculate payroll.
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Payroll ID</th>
+                    <th>Employee ID</th>
+                    <th>Working Days</th>
+                    <th>Present Days</th>
+                    <th>Absent Days</th>
+                    <th>Leave Days</th>
+                    <th>Basic Salary (Rs.)</th>
+                    <th>Allowances (Rs.)</th>
+                    <th>Overtime (Rs.)</th>
+                    <th>Deductions (Rs.)</th>
+                    <th>Tax (Rs.)</th>
+                    <th>Net Salary (Rs.)</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="payroll : ${payrollRecords}">
+                    <td th:text="${payroll.payrollId}">1</td>
+                    <td th:text="${payroll.employeeId}">1</td>
+
+                    <td th:text="${payroll.workingDays != null
+                                  ? payroll.workingDays : 0}">22</td>
+
+                    <td th:text="${payroll.presentDays != null
+                                  ? payroll.presentDays : 0}">20</td>
+
+                    <td th:text="${payroll.absentDays != null
+                                  ? payroll.absentDays : 0}">1</td>
+
+                    <td th:text="${payroll.leaveDays != null
+                                  ? payroll.leaveDays : 0}">1</td>
+
+                    <td th:text="${#numbers.formatDecimal(
+                                  payroll.basicSalary != null
+                                  ? payroll.basicSalary : 0, 1, 2)}">
+                        90000.00
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(
+                                  payroll.allowances != null
+                                  ? payroll.allowances : 0, 1, 2)}">
+                        5000.00
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(
+                                  payroll.overtime != null
+                                  ? payroll.overtime : 0, 1, 2)}">
+                        0.00
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(
+                                  payroll.deductions != null
+                                  ? payroll.deductions : 0, 1, 2)}">
+                        0.00
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(
+                                  payroll.tax != null
+                                  ? payroll.tax : 0, 1, 2)}">
+                        0.00
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(
+                                  payroll.netSalary != null
+                                  ? payroll.netSalary : 0, 1, 2)}">
+                        95000.00
+                    </td>
+
+                    <td>
+                        <span class="status"
+                              th:classappend="${payroll.status != null
+                                  and payroll.status.name() == 'PAID'
+                                  ? ' status-paid'
+                                  : (payroll.status != null
+                                  and payroll.status.name() == 'APPROVED'
+                                  ? ' status-approved'
+                                  : (payroll.status != null
+                                  and payroll.status.name() == 'CALCULATED'
+                                  ? ' status-calculated'
+                                  : (payroll.status != null
+                                  and payroll.status.name() == 'DRAFT'
+                                  ? ' status-draft' : '')))}"
+                              th:text="${payroll.status != null
+                                  ? payroll.status : 'UNKNOWN'}">
+                            CALCULATED
+                        </span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payrollRecords)}">
+                    <td colspan="13" class="empty-message">
+                        No payroll records found for this month.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Attendance Snapshot Comparison -->
+    <section class="panel"
+             th:if="${currentAttendanceSummaries != null
+                     and !#lists.isEmpty(currentAttendanceSummaries)}">
+
+        <h2 class="section-heading">Attendance Snapshot Comparison</h2>
+
+        <p class="section-description">
+            Compares the attendance counts saved in each payroll record
+            with the current read-only summary generated by PayrollService.
+            A difference is informational and does not update payroll.
+        </p>
+
+        <div class="financial-note">
+            <strong>How to read this table:</strong>
+            Saved values are the attendance counts stored in payroll.
+            Current values come from the attendance summary calculated
+            when this report is opened. Missing days are not automatically
+            treated as confirmed absences.
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Payroll ID</th>
+                    <th>Employee ID</th>
+                    <th>Saved Working</th>
+                    <th>Saved Present</th>
+                    <th>Saved Absent</th>
+                    <th>Saved Leave</th>
+                    <th>Current Working</th>
+                    <th>Current Present</th>
+                    <th>Current Absent</th>
+                    <th>Current Leave</th>
+                    <th>Current Missing</th>
+                    <th>Comparison</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="row : ${currentAttendanceSummaries}">
+                    <td th:text="${row['payrollId']}">1</td>
+                    <td th:text="${row['employeeId']}">1</td>
+
+                    <td th:text="${row['savedWorkingDays']}">0</td>
+                    <td th:text="${row['savedPresentDays']}">0</td>
+                    <td th:text="${row['savedAbsentDays']}">0</td>
+                    <td th:text="${row['savedLeaveDays']}">0</td>
+
+                    <td th:text="${row['currentWorkingDays']}">0</td>
+                    <td th:text="${row['currentPresentDays']}">0</td>
+                    <td th:text="${row['currentAbsentDays']}">0</td>
+                    <td th:text="${row['currentLeaveDays']}">0</td>
+                    <td th:text="${row['currentMissingDays']}">0</td>
+
+                    <td>
+                        <span class="status"
+                              th:classappend="${row['snapshotDiffers']
+                                  ? ' status-different' : ' status-match'}"
+                              th:text="${row['snapshotDiffers']
+                                  ? 'DIFFERENT' : 'MATCH'}">
+                            MATCH
+                        </span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(currentAttendanceSummaries)}">
+                    <td colspan="12" class="empty-message">
+                        No attendance comparison data is available.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="report-note">
+            DIFFERENT means one or more saved day counts differ from the
+            current summary. MATCH means the displayed day counts match;
+            it does not independently certify that all attendance records
+            are complete.
+        </p>
+    </section>
+
+    <footer class="footer">
+        Generated by Smart Attendance &amp; Payroll System.
+        Stored payroll amounts and statuses are not changed by this report.
+    </footer>
+
+</div>
+
+<script>
+    (function () {
+        const monthInput = document.getElementById("month");
+        const filterForm = document.getElementById("reportFilterForm");
+        const printButton = document.getElementById("printReportButton");
+
+        if (monthInput) {
+            const now = new Date();
+
+            const currentMonth =
+                now.getFullYear() + "-" +
+                String(now.getMonth() + 1).padStart(2, "0");
+
+            monthInput.max = currentMonth;
+        }
+
+        if (filterForm && monthInput) {
+            filterForm.addEventListener("submit", function (event) {
+                if (!monthInput.value) {
+                    event.preventDefault();
+                    monthInput.setCustomValidity(
+                        "Please select a payroll month."
+                    );
+                    monthInput.reportValidity();
+                    return;
+                }
+
+                const selected = monthInput.value;
+
+                if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(selected)) {
+                    event.preventDefault();
+                    monthInput.setCustomValidity(
+                        "Please select a valid payroll month."
+                    );
+                    monthInput.reportValidity();
+                    return;
+                }
+
+                monthInput.setCustomValidity("");
+            });
+
+            monthInput.addEventListener("change", function () {
+                monthInput.setCustomValidity("");
+            });
+        }
+
+        if (printButton) {
+            printButton.addEventListener("click", function () {
+                window.print();
+            });
+        }
+    })();
+</script>
+
+</body>
+</html>

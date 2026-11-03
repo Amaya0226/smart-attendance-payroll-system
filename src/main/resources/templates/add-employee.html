@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Employee | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #5b5ce2;
+            --primary-dark: #4849c8;
+            --background: #f5f6fb;
+            --surface: #ffffff;
+            --text: #20243a;
+            --muted: #737b91;
+            --border: #e5e8f0;
+            --danger: #dc3545;
+            --shadow: 0 8px 30px rgba(31, 41, 85, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 72px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eeeeff;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .top-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .top-link:hover {
+            color: var(--primary);
+        }
+
+        .page-container {
+            max-width: 1050px;
+            margin: 38px auto;
+            padding: 0 22px 40px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 9px;
+            align-items: center;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 23px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: #eeeeff;
+            color: var(--primary);
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .form-body {
+            padding: 28px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 750;
+            margin-bottom: 19px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #343b56;
+        }
+
+        .section-title span {
+            width: 27px;
+            height: 27px;
+            border-radius: 8px;
+            background: #eeeeff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px 22px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #424961;
+        }
+
+        .required {
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 45px;
+            padding: 0 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: #fff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input::placeholder {
+            color: #a4aabd;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 92, 226, .10);
+        }
+
+        .field-error {
+            color: var(--danger);
+            font-size: 11px;
+            margin-top: 7px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            border: 1px solid #ffd4d4;
+            color: #b42332;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .form-footer {
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-note {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .btn {
+            min-height: 43px;
+            padding: 0 19px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(91, 92, 226, .20);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f1f2f7;
+            color: #50566d;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaf2;
+        }
+
+        .page-footer {
+            text-align: center;
+            color: #9299aa;
+            font-size: 11px;
+            padding: 25px 0 0;
+        }
+
+        @media (max-width: 650px) {
+            .topbar {
+                height: 64px;
+                padding: 0 18px;
+            }
+
+            .brand {
+                font-size: 13px;
+            }
+
+            .page-container {
+                margin: 25px auto;
+                padding: 0 14px 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card-header {
+                padding: 19px;
+            }
+
+            .form-body {
+                padding: 20px 17px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 17px;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .buttons {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer-note {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">✦</div>
+        <span>Smart Attendance & Payroll</span>
+    </div>
+
+    <a href="/" class="top-link">← Dashboard</a>
+</header>
+
+<main class="page-container">
+
+    <div class="breadcrumb">
+        <a href="/">Dashboard</a>
+        <span>/</span>
+        <a href="/employees">Employees</a>
+        <span>/</span>
+        <span>Add Employee</span>
+    </div>
+
+    <div class="page-heading">
+        <h1>Add New Employee</h1>
+        <p>Create a new employee profile and add their employment information to the system.</p>
+    </div>
+
+    <div class="form-card">
+
+        <div class="card-header">
+            <div class="header-icon">♙</div>
+            <div>
+                <h2>Employee Information</h2>
+                <p>Enter the employee details accurately.</p>
+            </div>
+        </div>
+
+        <div class="form-body">
+
+            <div th:if="${errorMessage}"
+                 class="error-message"
+                 th:text="${errorMessage}">
+            </div>
+
+            <form th:action="@{/employees/save}"
+                  th:object="${employee}"
+                  method="post">
+
+                <div class="section-title">
+                    <span>01</span>
+                    Personal & Contact Details
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="employeeCode">Employee Code</label>
+                        <input type="text"
+                               id="employeeCode"
+                               th:field="*{employeeCode}"
+                               placeholder="e.g. EMP008">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('employeeCode')}"
+                             th:errors="*{employeeCode}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text"
+                               id="fullName"
+                               th:field="*{fullName}"
+                               placeholder="Enter full name">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('fullName')}"
+                             th:errors="*{fullName}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nic">NIC</label>
+                        <input type="text"
+                               id="nic"
+                               th:field="*{nic}"
+                               placeholder="Enter NIC number">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('nic')}"
+                             th:errors="*{nic}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email"
+                               id="email"
+                               th:field="*{email}"
+                               placeholder="employee@example.com">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('email')}"
+                             th:errors="*{email}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text"
+                               id="phone"
+                               th:field="*{phone}"
+                               placeholder="Enter phone number">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('phone')}"
+                             th:errors="*{phone}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text"
+                               id="address"
+                               th:field="*{address}"
+                               placeholder="Enter residential address">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('address')}"
+                             th:errors="*{address}"></div>
+                    </div>
+
+                </div>
+
+                <div class="section-title">
+                    <span>02</span>
+                    Employment Details
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text"
+                               id="department"
+                               th:field="*{department}"
+                               placeholder="e.g. IT">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('department')}"
+                             th:errors="*{department}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jobPosition">Job Position</label>
+                        <input type="text"
+                               id="jobPosition"
+                               th:field="*{jobPosition}"
+                               placeholder="e.g. Software Engineer">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('jobPosition')}"
+                             th:errors="*{jobPosition}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="joiningDate">Joining Date</label>
+                        <input type="date"
+                               id="joiningDate"
+                               name="joiningDate"
+                               th:value="${employee.joiningDate != null ? #temporals.format(employee.joiningDate, 'yyyy-MM-dd') : ''}">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('joiningDate')}"
+                             th:errors="*{joiningDate}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Employment Status</label>
+                        <select id="status" th:field="*{status}">
+                            <option value="">-- Select Status --</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('status')}"
+                             th:errors="*{status}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="basicSalary">Basic Salary (Rs.)</label>
+                        <input type="number"
+                               id="basicSalary"
+                               th:field="*{basicSalary}"
+                               step="0.01"
+                               min="0"
+                               placeholder="0.00">
+                        <div class="field-error"
+                             th:if="${#fields.hasErrors('basicSalary')}"
+                             th:errors="*{basicSalary}"></div>
+                    </div>
+
+                </div>
+
+                <div class="form-footer">
+
+                    <div class="footer-note">
+                        Please review all information before saving.<br>
+                        Employee details will be submitted to the system.
+                    </div>
+
+                    <div class="buttons">
+                        <a href="/employees" class="btn btn-secondary">
+                            ← Back to Employees
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            ✓ Save Employee
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        © 2026 Smart Attendance & Payroll System. All rights reserved.
+    </footer>
+
+</main>
+
+</body>
+</html>

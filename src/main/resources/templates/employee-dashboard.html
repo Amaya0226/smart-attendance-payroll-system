@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard | Smart Attendance &amp; Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary:#4f46e5;
+            --primary-dark:#4338ca;
+            --primary-light:#eef2ff;
+            --bg:#f5f6fb;
+            --surface:#fff;
+            --text:#172033;
+            --muted:#64748b;
+            --border:#e2e8f0;
+            --success:#15803d;
+            --success-bg:#dcfce7;
+            --shadow:0 8px 28px rgba(15,23,42,.05);
+        }
+
+        * { box-sizing:border-box; }
+
+        body {
+            margin:0;
+            min-height:100vh;
+            font-family:'Inter',sans-serif;
+            background:var(--bg);
+            color:var(--text);
+        }
+
+        header {
+            min-height:76px;
+            padding:0 5%;
+            background:#fff;
+            border-bottom:1px solid var(--border);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:20px;
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+
+        .brand {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            font-size:15px;
+            font-weight:800;
+            letter-spacing:-.4px;
+        }
+
+        .brand-icon {
+            width:43px;
+            height:43px;
+            border-radius:13px;
+            display:grid;
+            place-items:center;
+            color:#fff;
+            font-size:20px;
+            background:linear-gradient(135deg,#4f46e5,#7c3aed);
+        }
+
+        .brand-info {
+            display:flex;
+            flex-direction:column;
+            gap:4px;
+        }
+
+        .brand-info small {
+            font-size:10px;
+            font-weight:500;
+            color:var(--muted);
+        }
+
+        .logout {
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            color:#dc2626;
+            text-decoration:none;
+            font-size:12px;
+            font-weight:700;
+            background:#fef2f2;
+            border:1px solid #fee2e2;
+            padding:10px 15px;
+            border-radius:9px;
+            transition:.2s;
+        }
+
+        .logout:hover { background:#fee2e2; }
+
+        .container {
+            width:min(1200px,92%);
+            margin:32px auto;
+        }
+
+        .welcome {
+            position:relative;
+            overflow:hidden;
+            background:linear-gradient(115deg,#312e81,#4f46e5 65%,#6366f1);
+            color:#fff;
+            padding:34px;
+            border-radius:19px;
+            margin-bottom:30px;
+            box-shadow:0 12px 30px rgba(79,70,229,.15);
+        }
+
+        .welcome::after {
+            content:"";
+            position:absolute;
+            width:260px;
+            height:260px;
+            border-radius:50%;
+            border:45px solid rgba(255,255,255,.07);
+            right:-70px;
+            top:-100px;
+            pointer-events:none;
+        }
+
+        .welcome-content { position:relative; z-index:1; }
+
+        .welcome small {
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            background:rgba(255,255,255,.14);
+            border:1px solid rgba(255,255,255,.15);
+            padding:8px 12px;
+            border-radius:20px;
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:1px;
+        }
+
+        .welcome h1 {
+            font-size:29px;
+            font-weight:800;
+            letter-spacing:-.8px;
+            margin:19px 0 10px;
+        }
+
+        .welcome p {
+            font-size:13px;
+            line-height:1.8;
+            color:#e0e7ff;
+            max-width:650px;
+            margin:0;
+        }
+
+        .welcome-highlight {
+            margin-top:21px;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:9px 13px;
+            background:rgba(255,255,255,.12);
+            border-radius:9px;
+            font-size:11px;
+            font-weight:600;
+        }
+
+        .section-title { margin:30px 0 16px; }
+
+        .section-title h2 {
+            font-size:18px;
+            font-weight:800;
+            letter-spacing:-.4px;
+            margin:0 0 6px;
+        }
+
+        .section-title p {
+            color:var(--muted);
+            font-size:12px;
+            margin:0;
+            line-height:1.6;
+        }
+
+        .profile-card {
+            background:var(--surface);
+            padding:25px;
+            border:1px solid var(--border);
+            border-radius:16px;
+            box-shadow:var(--shadow);
+        }
+
+        .profile-heading {
+            display:flex;
+            align-items:center;
+            gap:15px;
+            padding-bottom:22px;
+            border-bottom:1px solid #edf0f5;
+        }
+
+        .avatar {
+            flex-shrink:0;
+            width:55px;
+            height:55px;
+            border-radius:15px;
+            background:var(--primary-light);
+            color:var(--primary);
+            display:grid;
+            place-items:center;
+            font-size:25px;
+        }
+
+        .profile-heading h3 {
+            margin:0 0 6px;
+            font-size:16px;
+            font-weight:800;
+        }
+
+        .profile-heading p {
+            margin:0;
+            color:var(--muted);
+            font-size:11px;
+        }
+
+        .profile-heading p strong { color:#334155; }
+
+        .active {
+            margin-left:auto;
+            background:var(--success-bg);
+            color:var(--success);
+            padding:7px 12px;
+            border-radius:20px;
+            font-size:10px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .profile-grid {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:20px;
+            padding-top:23px;
+        }
+
+        .profile-item {
+            min-width:0;
+            padding:12px;
+            border-radius:10px;
+            transition:background .2s;
+        }
+
+        .profile-item:hover { background:#f8faff; }
+
+        .info-label {
+            display:block;
+            font-size:10px;
+            color:#8290a5;
+            text-transform:uppercase;
+            letter-spacing:.6px;
+            margin-bottom:8px;
+            font-weight:700;
+        }
+
+        .info-value {
+            display:block;
+            font-size:12px;
+            font-weight:700;
+            color:#263449;
+            overflow-wrap:anywhere;
+            line-height:1.6;
+        }
+
+        .services {
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:18px;
+        }
+
+        .service {
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:15px;
+            padding:23px;
+            box-shadow:var(--shadow);
+            display:flex;
+            flex-direction:column;
+            min-height:225px;
+            transition:transform .2s,box-shadow .2s;
+        }
+
+        .service:hover {
+            transform:translateY(-3px);
+            box-shadow:0 13px 30px rgba(15,23,42,.08);
+        }
+
+        .service-icon {
+            width:46px;
+            height:46px;
+            display:grid;
+            place-items:center;
+            background:var(--primary-light);
+            color:var(--primary);
+            border-radius:12px;
+            font-size:21px;
+            margin-bottom:17px;
+        }
+
+        .service h3 {
+            margin:0 0 9px;
+            font-size:15px;
+            font-weight:800;
+        }
+
+        .service p {
+            color:var(--muted);
+            font-size:11px;
+            line-height:1.8;
+            margin:0 0 20px;
+            flex-grow:1;
+        }
+
+        .service-link {
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            text-decoration:none;
+            color:#fff;
+            background:var(--primary);
+            padding:11px 13px;
+            border-radius:9px;
+            font-size:11px;
+            font-weight:700;
+            text-align:center;
+            transition:background .2s;
+        }
+
+        .service-link:hover { background:var(--primary-dark); }
+
+        footer {
+            text-align:center;
+            color:#8792a5;
+            font-size:11px;
+            line-height:1.8;
+            padding:30px 15px 22px;
+            margin-top:35px;
+            border-top:1px solid var(--border);
+        }
+
+        @media(max-width:900px) {
+            .profile-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        }
+
+        @media(max-width:600px) {
+            header { padding:14px 4%; }
+            .brand { font-size:12px; }
+            .brand-icon { width:38px; height:38px; }
+            .logout { padding:9px 11px; font-size:11px; }
+            .container { width:92%; margin:22px auto; }
+            .welcome { padding:24px 21px; border-radius:15px; }
+            .welcome h1 { font-size:22px; line-height:1.5; }
+            .welcome p { font-size:12px; }
+            .profile-card { padding:18px; }
+            .profile-grid,.services {
+                grid-template-columns:1fr;
+                gap:10px;
+            }
+            .profile-heading { flex-wrap:wrap; }
+            .active { margin-left:0; }
+            .profile-item { padding:11px; }
+            .service { min-height:215px; }
+            .section-title h2 { font-size:17px; }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            *,*::before,*::after {
+                scroll-behavior:auto!important;
+                transition-duration:.01ms!important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-icon">✓</div>
+        <div class="brand-info">
+            <span>Smart Attendance &amp; Payroll</span>
+            <small>Employee Self-Service Portal</small>
+        </div>
+    </div>
+
+    <a class="logout" th:href="@{/logout}">
+        Logout <span>↗</span>
+    </a>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <div class="welcome-content">
+            <small><span>●</span> EMPLOYEE SELF-SERVICE PORTAL</small>
+
+            <h1>
+                Welcome,
+                <span th:text="${employee.fullName}">Employee</span>
+                👋
+            </h1>
+
+            <p>
+                Welcome to your employee portal. Manage your personal
+                information and access your attendance and payroll services
+                from one place.
+            </p>
+
+            <div class="welcome-highlight">
+                <span>✦</span>
+                Your personal employee workspace
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">
+            <h2>My Profile</h2>
+            <p>Your personal and employment information</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-heading">
+                <div class="avatar">👤</div>
+
+                <div>
+                    <h3 th:text="${employee.fullName}">Employee Name</h3>
+                    <p>
+                        Employee ID:
+                        <strong th:text="${employee.employeeCode}">EMP001</strong>
+                    </p>
+                </div>
+
+                <span class="active" th:text="${employee.status}">ACTIVE</span>
+            </div>
+
+            <div class="profile-grid">
+
+                <div class="profile-item">
+                    <span class="info-label">Employee Code</span>
+                    <span class="info-value" th:text="${employee.employeeCode}">EMP001</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value" th:text="${employee.fullName}">Employee</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">NIC Number</span>
+                    <span class="info-value" th:text="${employee.nic}">NIC</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Email Address</span>
+                    <span class="info-value" th:text="${employee.email}">email@example.com</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Phone Number</span>
+                    <span class="info-value"
+                          th:text="${employee.phone != null and !employee.phone.isEmpty() ? employee.phone : 'Not provided'}">Phone</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Department</span>
+                    <span class="info-value"
+                          th:text="${employee.department != null and !employee.department.isEmpty() ? employee.department : 'Not assigned'}">Department</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Job Position</span>
+                    <span class="info-value"
+                          th:text="${employee.jobPosition != null and !employee.jobPosition.isEmpty() ? employee.jobPosition : 'Not assigned'}">Position</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Joining Date</span>
+                    <span class="info-value"
+                          th:text="${employee.joiningDate != null ? #temporals.format(employee.joiningDate, 'dd MMM yyyy') : 'N/A'}">Joining Date</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Basic Salary</span>
+                    <span class="info-value"
+                          th:text="${'Rs. ' + #numbers.formatDecimal(employee.basicSalary, 1, 2)}">Rs. 0.00</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Employment Status</span>
+                    <span class="info-value" th:text="${employee.status}">ACTIVE</span>
+                </div>
+
+                <div class="profile-item">
+                    <span class="info-label">Address</span>
+                    <span class="info-value"
+                          th:text="${employee.address != null and !employee.address.isEmpty() ? employee.address : 'Not provided'}">Address</span>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-title">
+            <h2>My Services</h2>
+            <p>Access your employee services and information</p>
+        </div>
+
+        <div class="services">
+
+            <article class="service">
+                <div class="service-icon">📅</div>
+                <h3>My Attendance</h3>
+                <p>
+                    View your attendance records, check-in,
+                    check-out and daily attendance status.
+                </p>
+                <a class="service-link" th:href="@{/employee/attendance}">
+                    View Attendance →
+                </a>
+            </article>
+
+            <article class="service">
+                <div class="service-icon">💰</div>
+                <h3>My Payroll</h3>
+                <p>
+                    View monthly salary, allowances, deductions,
+                    overtime, tax and payroll status.
+                </p>
+                <a class="service-link" th:href="@{/employee/payroll}">
+                    View My Payroll →
+                </a>
+            </article>
+
+            <article class="service">
+                <div class="service-icon">📄</div>
+                <h3>My Payslips</h3>
+                <p>
+                    Access your monthly salary statements
+                    and print or save them as PDF.
+                </p>
+                <a class="service-link" th:href="@{/employee/payslips}">
+                    View My Payslips →
+                </a>
+            </article>
+
+            <article class="service">
+                <div class="service-icon">🔐</div>
+                <h3>Account Settings</h3>
+                <p>
+                    Change your account password and manage
+                    your account security settings.
+                </p>
+                <a class="service-link" th:href="@{/employee/account-settings}">
+                    Manage Account →
+                </a>
+            </article>
+
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    Smart Attendance &amp; Payroll System © 2026
+    <br>
+    Employee Self-Service Portal
+</footer>
+
+</body>
+</html>

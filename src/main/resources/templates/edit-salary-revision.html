@@ -1,0 +1,589 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Salary Revision | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #eef2ff;
+            --bg: #f5f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #15803d;
+            --danger: #b91c1c;
+            --shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(120deg, #312e81, #4f46e5);
+            color: white;
+            padding: 24px 5%;
+            box-shadow: 0 4px 15px rgba(49, 46, 129, 0.16);
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 13px;
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            color: #dddfff;
+            font-size: 12px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            margin: 38px auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 20px;
+            color: var(--muted);
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 27px 32px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(to right, #ffffff, #fafaff);
+        }
+
+        .heading-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .heading-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .card-body {
+            padding: 30px 32px 32px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 0 0 19px;
+        }
+
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #dbe1eb;
+            border-radius: 10px;
+            background: #fff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input,
+        select {
+            min-height: 45px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.11);
+        }
+
+        textarea {
+            min-height: 105px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .field-hint {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .info-box {
+            background: #f8faff;
+            border: 1px solid #dfe5ff;
+            border-radius: 13px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .info-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #3730a3;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .info-item {
+            background: white;
+            border: 1px solid #e6eaff;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .info-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #1e293b;
+            font-size: 17px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .info-value.primary {
+            color: var(--primary);
+        }
+
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+        }
+
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 23px;
+            margin-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            min-height: 44px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            color: white;
+            background: var(--primary);
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.18);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            color: #475569;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            margin: 22px 0 35px;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 19px 20px;
+            }
+
+            .brand h1 {
+                font-size: 17px;
+            }
+
+            .container {
+                margin: 24px auto;
+                padding: 0 13px;
+            }
+
+            .card {
+                border-radius: 14px;
+            }
+
+            .card-header {
+                padding: 22px 19px;
+            }
+
+            .card-body {
+                padding: 23px 19px;
+            }
+
+            .card-header h2 {
+                font-size: 18px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="brand">
+            <div class="brand-icon">💼</div>
+            <div>
+                <h1>Smart Attendance & Payroll</h1>
+                <p>Salary Revision Management</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+    <div class="breadcrumb">
+        <a th:href="@{/salary-revisions}">Salary Revisions</a>
+        <span>/</span>
+        <span>Edit Salary Revision</span>
+    </div>
+
+    <div class="card">
+
+        <div class="card-header">
+            <div class="heading-row">
+                <div class="heading-icon">✎</div>
+                <div>
+                    <h2>Edit Salary Revision</h2>
+                    <p>Update employee salary revision information and effective date.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div th:if="${errorMessage}"
+                 class="alert alert-error">
+                <span>⚠</span>
+                <span th:text="${errorMessage}">Error message</span>
+            </div>
+
+            <form th:action="@{/salary-revisions/update}"
+                  th:object="${salaryRevision}"
+                  method="post">
+
+                <h3 class="section-title">Employee Information</h3>
+
+                <div class="form-group">
+                    <label for="employeeId">
+                        Employee <span class="required">*</span>
+                    </label>
+
+                    <select id="employeeId"
+                            th:field="*{employeeId}"
+                            required>
+                        <option th:each="employee : ${employees}"
+                                th:value="${employee.employeeId}"
+                                th:text="${employee.employeeCode + ' - ' + employee.fullName}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-heading">
+                        <span>▣</span>
+                        Salary Information
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Previous Salary</div>
+                            <div class="info-value">
+                                Rs. <span th:text="${salaryRevision.previousSalary}">90000.00</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Current Employee Salary</div>
+                            <div class="info-value primary" id="currentSalary">
+                                Loading...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Revision Details</h3>
+
+                <div class="form-group">
+                    <label for="effectiveDate">
+                        Effective Date <span class="required">*</span>
+                    </label>
+
+                    <input type="date"
+                           id="effectiveDate"
+                           name="effectiveDate"
+                           th:value="${salaryRevision.effectiveDate != null ? #temporals.format(salaryRevision.effectiveDate, 'yyyy-MM-dd') : ''}"
+                           required>
+                    <div class="field-hint">
+                        Select the date from which the revised salary becomes effective.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newSalary">
+                        New Basic Salary (Rs.) <span class="required">*</span>
+                    </label>
+
+                    <input type="number"
+                           id="newSalary"
+                           th:field="*{newSalary}"
+                           min="0.01"
+                           step="0.01"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="revisionType">
+                        Revision Type <span class="required">*</span>
+                    </label>
+
+                    <select id="revisionType"
+                            th:field="*{revisionType}"
+                            required>
+                        <option value="INCREMENT">INCREMENT</option>
+                        <option value="REVISION">REVISION</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reason">Reason</label>
+
+                    <textarea id="reason"
+                              th:field="*{reason}"
+                              maxlength="500"
+                              placeholder="Enter reason for salary revision"></textarea>
+
+                    <div class="field-hint">
+                        Maximum 500 characters.
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a th:href="@{/salary-revisions}"
+                       class="btn btn-secondary">
+                        ← Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        ✓ Update Salary Revision
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Smart Attendance & Payroll Management System
+    </div>
+
+</main>
+
+<script>
+    const employeeSelect = document.getElementById("employeeId");
+
+    function loadCurrentSalary() {
+        const employeeId = employeeSelect.value;
+
+        if (!employeeId) {
+            document.getElementById("currentSalary")
+                .textContent = "Rs. 0.00";
+            return;
+        }
+
+        fetch("/payroll/employee-data/" + employeeId)
+            .then(response => response.json())
+            .then(salary => {
+                const amount = Number(salary || 0).toFixed(2);
+
+                document.getElementById("currentSalary")
+                    .textContent = "Rs. " + amount;
+            })
+            .catch(error => {
+                console.error("Error loading salary:", error);
+
+                document.getElementById("currentSalary")
+                    .textContent = "Unable to load salary";
+            });
+    }
+
+    employeeSelect.addEventListener("change", loadCurrentSalary);
+
+    loadCurrentSalary();
+</script>
+
+</body>
+</html>

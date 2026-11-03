@@ -1,0 +1,1437 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+    <title>Admin Dashboard | Smart Attendance &amp; Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary:#4f46e5;
+            --primary-dark:#3730a3;
+            --primary-light:#eef2ff;
+            --sidebar:#111827;
+            --sidebar-hover:#263449;
+            --bg:#f5f7fb;
+            --card:#fff;
+            --text:#111827;
+            --muted:#6b7280;
+            --border:#e5e7eb;
+            --green:#059669;
+            --red:#dc2626;
+            --orange:#d97706;
+            --blue:#2563eb;
+            --shadow:0 4px 18px rgba(15,23,42,.045);
+            --radius:15px;
+        }
+
+        * { box-sizing:border-box; }
+
+        html { scroll-behavior:smooth; }
+
+        body {
+            margin:0;
+            font-family:'Inter',Arial,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            -webkit-font-smoothing:antialiased;
+        }
+
+        a { text-decoration:none; color:inherit; }
+        button { font:inherit; }
+        .app { min-height:100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width:265px;
+            height:100vh;
+            position:fixed;
+            top:0;
+            left:0;
+            overflow-y:auto;
+            background:var(--sidebar);
+            color:#fff;
+            padding:23px 15px;
+            z-index:1000;
+            transition:transform .25s ease;
+            scrollbar-width:thin;
+            scrollbar-color:#374151 transparent;
+        }
+
+        .brand {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:2px 10px 24px;
+            border-bottom:1px solid #2c3748;
+        }
+
+        .brand-icon {
+            width:44px;
+            height:44px;
+            flex-shrink:0;
+            border-radius:13px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg,#6366f1,#4338ca);
+            box-shadow:0 5px 15px rgba(79,70,229,.28);
+            font-size:22px;
+            font-weight:800;
+        }
+
+        .brand-title { font-size:14px; font-weight:800; line-height:1.5; }
+        .brand-subtitle { color:#9ca3af; font-size:10px; margin-top:3px; }
+
+        .menu-heading {
+            margin:24px 11px 9px;
+            color:#8491a5;
+            text-transform:uppercase;
+            font-size:9px;
+            font-weight:800;
+            letter-spacing:1.4px;
+        }
+
+        .nav-link {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:12px 13px;
+            margin:4px 0;
+            color:#cbd5e1;
+            border-radius:10px;
+            font-size:11.5px;
+            font-weight:600;
+            transition:background .2s,color .2s;
+        }
+
+        .nav-link:hover,.nav-link.active {
+            background:var(--sidebar-hover);
+            color:#fff;
+        }
+
+        .nav-link.active {
+            background:linear-gradient(90deg,#4338ca,#3730a3);
+            box-shadow:0 4px 12px rgba(67,56,202,.2);
+        }
+
+        .nav-icon {
+            width:22px;
+            flex-shrink:0;
+            text-align:center;
+            font-size:17px;
+        }
+
+        .sidebar-footer {
+            margin-top:28px;
+            padding:17px 9px 5px;
+            border-top:1px solid #2c3748;
+            display:flex;
+            gap:11px;
+            align-items:center;
+        }
+
+        .avatar {
+            width:38px;
+            height:38px;
+            flex-shrink:0;
+            border-radius:12px;
+            background:#4338ca;
+            color:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+            font-weight:800;
+        }
+
+        .admin-name { font-size:11px; font-weight:700; }
+        .admin-role { font-size:10px; color:#9ca3af; margin-top:4px; }
+
+        /* MAIN LAYOUT */
+        .main { margin-left:265px; min-height:100vh; }
+
+        .topbar {
+            min-height:76px;
+            padding:15px 30px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            background:rgba(255,255,255,.96);
+            border-bottom:1px solid var(--border);
+            position:sticky;
+            top:0;
+            z-index:100;
+            backdrop-filter:blur(12px);
+        }
+
+        .topbar-left { display:flex; align-items:center; gap:12px; }
+        .breadcrumb { color:var(--muted); font-size:10px; margin-bottom:5px; }
+        .topbar-title { font-size:15px; font-weight:800; }
+        .topbar-right { display:flex; align-items:center; gap:10px; }
+
+        .date-chip {
+            padding:10px 12px;
+            background:#f8fafc;
+            border:1px solid var(--border);
+            border-radius:9px;
+            color:#374151;
+            font-size:10px;
+            font-weight:600;
+        }
+
+        .logout {
+            background:#fff1f2;
+            color:#be123c;
+            border:1px solid #ffe4e6;
+            border-radius:9px;
+            padding:10px 13px;
+            font-size:10px;
+            font-weight:800;
+            transition:background .2s;
+        }
+
+        .logout:hover { background:#ffe4e6; }
+
+        .mobile-toggle {
+            display:none;
+            border:1px solid #e0e7ff;
+            border-radius:9px;
+            background:var(--primary-light);
+            color:var(--primary);
+            padding:9px 12px;
+            cursor:pointer;
+        }
+
+        .sidebar-overlay { display:none; }
+
+        .content {
+            padding:28px 30px 35px;
+            max-width:1700px;
+            margin:auto;
+        }
+
+        /* WELCOME */
+        .welcome {
+            position:relative;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+            margin-bottom:25px;
+            padding:27px 29px;
+            color:#fff;
+            border-radius:17px;
+            background:linear-gradient(115deg,#312e81 0%,#4338ca 53%,#6366f1 100%);
+            box-shadow:0 10px 28px rgba(67,56,202,.15);
+        }
+
+        .welcome::after {
+            content:"";
+            position:absolute;
+            width:250px;
+            height:250px;
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:50%;
+            right:-70px;
+            top:-120px;
+            box-shadow:0 0 0 35px rgba(255,255,255,.035),
+                       0 0 0 70px rgba(255,255,255,.025);
+            pointer-events:none;
+        }
+
+        .welcome-content { position:relative; z-index:1; }
+        .eyebrow {
+            color:#c7d2fe;
+            text-transform:uppercase;
+            letter-spacing:1.5px;
+            font-size:9px;
+            font-weight:800;
+            margin-bottom:10px;
+        }
+
+        .welcome h1 {
+            margin:0;
+            font-size:25px;
+            font-weight:800;
+            letter-spacing:-.7px;
+        }
+
+        .welcome p {
+            margin:10px 0 0;
+            color:#e0e7ff;
+            font-size:11px;
+            line-height:1.8;
+            max-width:630px;
+        }
+
+        .welcome-badge {
+            position:relative;
+            z-index:1;
+            flex-shrink:0;
+            border:1px solid rgba(255,255,255,.22);
+            background:rgba(255,255,255,.11);
+            padding:12px 15px;
+            border-radius:11px;
+            font-size:10px;
+            font-weight:700;
+        }
+
+        /* QUICK ACCESS */
+        .quick-grid {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:14px;
+            margin-bottom:28px;
+        }
+
+        .quick-card {
+            display:block;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:19px;
+            min-width:0;
+            box-shadow:var(--shadow);
+            transition:transform .2s,box-shadow .2s,border-color .2s;
+        }
+
+        .quick-card:hover {
+            transform:translateY(-3px);
+            border-color:#c7d2fe;
+            box-shadow:0 12px 26px rgba(15,23,42,.08);
+        }
+
+        .quick-card:focus-visible,.nav-link:focus-visible,.text-link:focus-visible {
+            outline:3px solid #a5b4fc;
+            outline-offset:3px;
+        }
+
+        .quick-icon {
+            width:41px;
+            height:41px;
+            border-radius:12px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:19px;
+            margin-bottom:15px;
+        }
+
+        .icon-purple { background:#ede9fe; color:#6d28d9; }
+        .icon-blue { background:#dbeafe; color:#1d4ed8; }
+        .icon-green { background:#d1fae5; color:#047857; }
+        .icon-orange { background:#ffedd5; color:#c2410c; }
+        .icon-pink { background:#fce7f3; color:#be185d; }
+
+        .quick-card h3 { margin:0 0 8px; font-size:12px; font-weight:800; }
+
+        .quick-card p {
+            margin:0 0 15px;
+            color:var(--muted);
+            font-size:10px;
+            line-height:1.8;
+            min-height:36px;
+        }
+
+        .quick-link { color:var(--primary); font-size:10px; font-weight:800; }
+
+        /* SECTION HEADERS */
+        .section-title {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin:28px 0 15px;
+        }
+
+        .section-title h2 { font-size:14px; margin:0; font-weight:800; }
+        .section-title p { font-size:10px; color:var(--muted); margin:5px 0 0; }
+
+        .text-link {
+            color:var(--primary);
+            font-size:10px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+
+        .text-link:hover { color:var(--primary-dark); text-decoration:underline; }
+
+        /* STATISTICS */
+        .stats-grid {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:14px;
+        }
+
+        .stat-card {
+            background:#fff;
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:19px;
+            box-shadow:var(--shadow);
+            min-width:0;
+            transition:box-shadow .2s,transform .2s;
+        }
+
+        .stat-card:hover {
+            box-shadow:0 9px 23px rgba(15,23,42,.07);
+            transform:translateY(-2px);
+        }
+
+        .stat-top {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:8px;
+        }
+
+        .stat-label {
+            color:var(--muted);
+            font-size:10px;
+            font-weight:600;
+            line-height:1.7;
+        }
+
+        .stat-icon {
+            width:36px;
+            height:36px;
+            border-radius:11px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:17px;
+            flex-shrink:0;
+        }
+
+        .stat-value {
+            margin-top:15px;
+            font-size:28px;
+            font-weight:800;
+            letter-spacing:-.8px;
+            overflow-wrap:anywhere;
+        }
+
+        .stat-foot { color:var(--muted); font-size:9px; margin-top:7px; line-height:1.7; }
+
+        /* PANELS */
+        .two-column {
+            display:grid;
+            grid-template-columns:minmax(0,1.35fr) minmax(280px,1fr);
+            gap:17px;
+            margin-top:22px;
+        }
+
+        .panel {
+            background:#fff;
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            overflow:hidden;
+            min-width:0;
+        }
+
+        .panel-header {
+            padding:18px 20px;
+            border-bottom:1px solid #edf0f4;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+        }
+
+        .panel-header h2 { margin:0; font-size:12px; font-weight:800; }
+
+        .panel-header p {
+            margin:6px 0 0;
+            color:var(--muted);
+            font-size:9px;
+            line-height:1.7;
+        }
+
+        .panel-body { padding:20px; }
+        .chart-wrap { position:relative; width:100%; height:275px; }
+
+        /* DAILY SUMMARY */
+        .summary-row {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            padding:13px 0;
+            border-bottom:1px solid #f0f2f5;
+        }
+
+        .summary-row:last-of-type { border-bottom:0; }
+
+        .summary-label {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            font-size:10px;
+            color:#4b5563;
+            font-weight:600;
+        }
+
+        .summary-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .summary-value { font-size:15px; font-weight:800; }
+
+        .summary-note {
+            background:#fff7ed;
+            border:1px solid #ffedd5;
+            color:#9a3412;
+            border-radius:10px;
+            padding:12px 13px;
+            font-size:10px;
+            line-height:1.8;
+            margin-top:15px;
+        }
+
+        /* PAYROLL OVERVIEW */
+        .money-grid {
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:12px;
+        }
+
+        .money-card {
+            border:1px solid var(--border);
+            border-radius:11px;
+            padding:16px;
+            min-width:0;
+            background:#fff;
+        }
+
+        .money-label { color:var(--muted); font-size:10px; line-height:1.7; }
+        .money-value { font-size:17px; font-weight:800; margin-top:9px; overflow-wrap:anywhere; }
+
+        .money-total {
+            grid-column:1/-1;
+            background:linear-gradient(115deg,#eef2ff,#f5f3ff);
+            border-color:#e0e7ff;
+        }
+
+        .money-total .money-value { color:var(--primary-dark); font-size:25px; }
+
+        /* TABLE */
+        .table-scroll { width:100%; overflow-x:auto; }
+
+        table { width:100%; border-collapse:collapse; white-space:nowrap; }
+
+        th {
+            background:#f8fafc;
+            color:#6b7280;
+            text-align:left;
+            padding:13px 16px;
+            font-size:9px;
+            text-transform:uppercase;
+            letter-spacing:.6px;
+            border-bottom:1px solid var(--border);
+        }
+
+        td { padding:13px 16px; font-size:10px; border-bottom:1px solid #f0f2f5; }
+
+        tbody tr { transition:background .15s; }
+        tbody tr:hover { background:#f8faff; }
+        tbody tr:last-child td { border-bottom:0; }
+
+        .employee-cell { display:flex; align-items:center; gap:10px; }
+
+        .employee-avatar {
+            width:34px;
+            height:34px;
+            border-radius:10px;
+            background:#e0e7ff;
+            color:#4338ca;
+            font-size:11px;
+            font-weight:800;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .employee-name { font-weight:700; color:#1f2937; }
+        .employee-sub { color:#9ca3af; font-size:9px; margin-top:4px; }
+
+        .status {
+            display:inline-block;
+            padding:6px 9px;
+            border-radius:20px;
+            font-size:9px;
+            font-weight:800;
+        }
+
+        .status-present,.status-late { background:#d1fae5; color:#047857; }
+        .status-absent { background:#fee2e2; color:#b91c1c; }
+        .status-leave { background:#fef3c7; color:#92400e; }
+        .status-other { background:#e5e7eb; color:#374151; }
+
+        .empty-state { padding:35px 20px; text-align:center; color:var(--muted); font-size:11px; }
+
+        .footer {
+            padding:26px 10px 8px;
+            color:#9ca3af;
+            font-size:9px;
+            text-align:center;
+            line-height:1.8;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:1250px) {
+            .quick-grid,.stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .two-column { grid-template-columns:1fr; }
+        }
+
+        @media(max-width:760px) {
+            .sidebar { transform:translateX(-100%); }
+
+            .sidebar.open {
+                transform:translateX(0);
+                box-shadow:10px 0 30px rgba(0,0,0,.22);
+            }
+
+            .sidebar-overlay.show {
+                display:block;
+                position:fixed;
+                inset:0;
+                background:rgba(15,23,42,.45);
+                z-index:900;
+            }
+
+            .main { margin-left:0; }
+            .topbar { padding:13px 15px; }
+            .mobile-toggle { display:inline-block; }
+            .topbar-title { font-size:13px; }
+            .breadcrumb { font-size:9px; }
+            .date-chip { display:none; }
+            .content { padding:20px 14px 28px; }
+
+            .welcome {
+                padding:22px 20px;
+                align-items:flex-start;
+                flex-direction:column;
+                gap:15px;
+            }
+
+            .welcome h1 { font-size:21px; }
+            .welcome p { font-size:10px; }
+            .welcome-badge { font-size:9px; }
+            .quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            .quick-card { padding:14px; }
+            .quick-card h3 { font-size:11px; }
+            .quick-card p { font-size:9px; }
+            .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            .stat-card { padding:14px; }
+            .stat-value { font-size:23px; }
+            .section-title h2 { font-size:12px; }
+            .panel-header { padding:15px; }
+            .panel-body { padding:15px; }
+            .chart-wrap { height:245px; }
+        }
+
+        @media(max-width:420px) {
+            .quick-grid,.stats-grid { grid-template-columns:1fr; }
+            .money-grid { grid-template-columns:1fr; }
+            .money-total { grid-column:auto; }
+            .topbar-right { gap:6px; }
+            .logout { padding:9px 10px; font-size:9px; }
+            .welcome h1 { font-size:19px; }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            *,*::before,*::after {
+                scroll-behavior:auto !important;
+                transition-duration:.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <a href="/dashboard" class="brand">
+            <div class="brand-icon">S</div>
+            <div>
+                <div class="brand-title">Smart Attendance</div>
+                <div class="brand-subtitle">Payroll Management</div>
+            </div>
+        </a>
+
+        <div class="menu-heading">Main Menu</div>
+
+        <a href="/dashboard" class="nav-link active" aria-current="page">
+            <span class="nav-icon">▦</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/employees" class="nav-link">
+            <span class="nav-icon">♙</span>
+            <span>Employee Management</span>
+        </a>
+
+        <a href="/attendance" class="nav-link">
+            <span class="nav-icon">◷</span>
+            <span>Attendance Management</span>
+        </a>
+
+        <a href="/qr-attendance" class="nav-link">
+            <span class="nav-icon">▣</span>
+            <span>QR Attendance</span>
+        </a>
+
+        <div class="menu-heading">Payroll Management</div>
+
+        <a href="/payroll" class="nav-link">
+            <span class="nav-icon">▤</span>
+            <span>Payroll Management</span>
+        </a>
+
+        <a href="/payroll-rules" class="nav-link">
+            <span class="nav-icon">⚙</span>
+            <span>Payroll Rules</span>
+        </a>
+
+        <a href="/overtime" class="nav-link">
+            <span class="nav-icon">◴</span>
+            <span>Overtime Management</span>
+        </a>
+
+        <a href="/salary-revisions" class="nav-link">
+            <span class="nav-icon">↗</span>
+            <span>Salary Revisions</span>
+        </a>
+
+        <a href="/holidays" class="nav-link">
+            <span class="nav-icon">▦</span>
+            <span>Holiday Management</span>
+        </a>
+
+        <div class="menu-heading">Reports &amp; Records</div>
+
+        <a href="/attendance/report" class="nav-link">
+            <span class="nav-icon">▧</span>
+            <span>Attendance Report</span>
+        </a>
+
+        <a href="/payroll/report" class="nav-link">
+            <span class="nav-icon">▧</span>
+            <span>Payroll Report</span>
+        </a>
+
+        <!-- NEW: EMPLOYEE PROFILE CHANGE REQUESTS -->
+        <a href="/admin/profile-change-requests" class="nav-link">
+            <span class="nav-icon">👤</span>
+            <span>Profile Change Requests</span>
+        </a>
+
+        <div class="sidebar-footer">
+            <div class="avatar">A</div>
+            <div>
+                <div class="admin-name">Administrator</div>
+                <div class="admin-role">System Admin</div>
+            </div>
+        </div>
+
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+                <button class="mobile-toggle"
+                        id="menuToggle"
+                        type="button"
+                        aria-label="Open navigation"
+                        aria-controls="sidebar"
+                        aria-expanded="false">☰</button>
+
+                <div>
+                    <div class="breadcrumb">Home / Dashboard / Overview</div>
+                    <div class="topbar-title">Administration Portal</div>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="date-chip" id="currentDate">Loading date...</div>
+                <a href="/logout" class="logout">↪ Logout</a>
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <!-- WELCOME -->
+            <section class="welcome">
+                <div class="welcome-content">
+                    <div class="eyebrow">Administration Workspace</div>
+                    <h1>Welcome back, Administrator 👋</h1>
+                    <p>
+                        Monitor workforce activity, review attendance records
+                        and manage monthly payroll from one place.
+                    </p>
+                </div>
+
+                <div class="welcome-badge">● System Overview</div>
+            </section>
+
+            <!-- QUICK ACCESS -->
+            <section class="quick-grid">
+
+                <a href="/employees" class="quick-card">
+                    <div class="quick-icon icon-purple">♙</div>
+                    <h3>Employee Management</h3>
+                    <p>Manage employee profiles, salary details and employee records.</p>
+                    <span class="quick-link">Open employees →</span>
+                </a>
+
+                <a href="/qr-attendance" class="quick-card">
+                    <div class="quick-icon icon-blue">▣</div>
+                    <h3>QR Attendance</h3>
+                    <p>Open QR scanning and attendance verification.</p>
+                    <span class="quick-link">Open scanner →</span>
+                </a>
+
+                <a href="/attendance" class="quick-card">
+                    <div class="quick-icon icon-green">◷</div>
+                    <h3>Attendance Management</h3>
+                    <p>Review attendance entries and daily employee status.</p>
+                    <span class="quick-link">Manage attendance →</span>
+                </a>
+
+                <a href="/payroll" class="quick-card">
+                    <div class="quick-icon icon-orange">▤</div>
+                    <h3>Payroll Management</h3>
+                    <p>Manage payroll entries and monthly salary calculations.</p>
+                    <span class="quick-link">Open payroll →</span>
+                </a>
+
+                <a href="/attendance/report" class="quick-card">
+                    <div class="quick-icon icon-green">▧</div>
+                    <h3>Attendance Report</h3>
+                    <p>Review attendance records and attendance summaries.</p>
+                    <span class="quick-link">View attendance report →</span>
+                </a>
+
+                <a href="/payroll/report" class="quick-card">
+                    <div class="quick-icon icon-blue">▧</div>
+                    <h3>Payroll Report</h3>
+                    <p>Review monthly payroll records, salary totals and deductions.</p>
+                    <span class="quick-link">View payroll report →</span>
+                </a>
+
+                <a href="/holidays" class="quick-card">
+                    <div class="quick-icon icon-pink">▦</div>
+                    <h3>Holiday Management</h3>
+                    <p>Manage public, mercantile and company holidays.</p>
+                    <span class="quick-link">Manage holidays →</span>
+                </a>
+
+                <a href="/overtime" class="quick-card">
+                    <div class="quick-icon icon-purple">◴</div>
+                    <h3>Overtime Management</h3>
+                    <p>View and manage employee overtime information.</p>
+                    <span class="quick-link">Manage overtime →</span>
+                </a>
+
+                <a href="/payroll-rules" class="quick-card">
+                    <div class="quick-icon icon-blue">⚙</div>
+                    <h3>Payroll Rules</h3>
+                    <p>Review the rules used for payroll calculations.</p>
+                    <span class="quick-link">View payroll rules →</span>
+                </a>
+
+                <a href="/salary-revisions" class="quick-card">
+                    <div class="quick-icon icon-green">↗</div>
+                    <h3>Salary Revisions</h3>
+                    <p>Review and manage employee salary revision records.</p>
+                    <span class="quick-link">View revisions →</span>
+                </a>
+
+                <!-- NEW QUICK ACCESS CARD -->
+                <a href="/admin/profile-change-requests" class="quick-card">
+                    <div class="quick-icon icon-orange">👤</div>
+                    <h3>Profile Change Requests</h3>
+                    <p>Review employee phone number and address change requests and approve or reject them.</p>
+                    <span class="quick-link">Review requests →</span>
+                </a>
+
+            </section>
+
+            <!-- KEY STATISTICS -->
+            <div class="section-title">
+                <div>
+                    <h2>Dashboard Overview</h2>
+                    <p>Current system summary</p>
+                </div>
+            </div>
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Employees</span>
+                        <span class="stat-icon icon-purple">♙</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${totalEmployees != null ? totalEmployees : 0}">0</div>
+                    <div class="stat-foot">Registered employee records</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Today's Attendance</span>
+                        <span class="stat-icon icon-blue">◷</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${todayAttendance != null ? todayAttendance : 0}">0</div>
+                    <div class="stat-foot">Attendance records for today</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Present Today</span>
+                        <span class="stat-icon icon-green">✓</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${presentToday != null ? presentToday : 0}">0</div>
+                    <div class="stat-foot">Includes present and late records</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Payroll Records</span>
+                        <span class="stat-icon icon-orange">▤</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${monthlyPayrollCount != null ? monthlyPayrollCount : 0}">0</div>
+                    <div class="stat-foot">
+                        Current month:
+                        <span th:text="${currentMonth != null ? currentMonth : 'N/A'}">N/A</span>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ATTENDANCE ANALYTICS + TODAY SUMMARY -->
+            <section class="two-column">
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>Attendance Analytics</h2>
+                            <p>
+                                Daily attendance activity for
+                                <span th:text="${currentMonth != null ? currentMonth : 'current month'}">
+                                    current month
+                                </span>
+                            </p>
+                        </div>
+                        <a href="/attendance" class="text-link">View Attendance →</a>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="chart-wrap">
+                            <canvas id="attendanceChart"
+                                    role="img"
+                                    aria-label="Monthly attendance line chart"></canvas>
+                        </div>
+                        <div id="chartEmptyState"
+                             class="empty-state"
+                             hidden>No chart data is available for this period.</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>Today's Summary</h2>
+                            <p>Attendance record overview</p>
+                        </div>
+                        <a href="/attendance" class="text-link">View records →</a>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <div class="summary-row">
+                            <div class="summary-label">
+                                <span class="summary-dot" style="background:#4f46e5;"></span>
+                                Attendance Records Today
+                            </div>
+                            <div class="summary-value"
+                                 th:text="${todayAttendance != null ? todayAttendance : 0}">0</div>
+                        </div>
+
+                        <div class="summary-row">
+                            <div class="summary-label">
+                                <span class="summary-dot" style="background:#059669;"></span>
+                                Present / Late
+                            </div>
+                            <div class="summary-value"
+                                 th:text="${presentToday != null ? presentToday : 0}">0</div>
+                        </div>
+
+                        <div class="summary-row">
+                            <div class="summary-label">
+                                <span class="summary-dot" style="background:#dc2626;"></span>
+                                Marked Absent
+                            </div>
+                            <div class="summary-value"
+                                 th:text="${absentToday != null ? absentToday : 0}">0</div>
+                        </div>
+
+                        <div class="summary-row">
+                            <div class="summary-label">
+                                <span class="summary-dot" style="background:#d97706;"></span>
+                                On Leave
+                            </div>
+                            <div class="summary-value"
+                                 th:text="${leaveToday != null ? leaveToday : 0}">0</div>
+                        </div>
+
+                        <div class="summary-row">
+                            <div class="summary-label">
+                                <span class="summary-dot" style="background:#9ca3af;"></span>
+                                Not Marked
+                            </div>
+                            <div class="summary-value"
+                                 th:text="${notMarkedToday != null ? notMarkedToday : 0}">0</div>
+                        </div>
+
+                        <div class="summary-note">
+                            Review attendance records regularly to identify
+                            employees whose attendance has not yet been recorded.
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- PAYROLL OVERVIEW -->
+            <div class="section-title">
+                <div>
+                    <h2>Monthly Payroll Overview</h2>
+                    <p>
+                        Payroll totals for
+                        <span th:text="${currentMonth != null ? currentMonth : 'current month'}">
+                            current month
+                        </span>
+                    </p>
+                </div>
+                <a href="/payroll" class="text-link">Manage Payroll →</a>
+            </div>
+
+            <section class="panel">
+                <div class="panel-body">
+                    <div class="money-grid">
+
+                        <div class="money-card money-total">
+                            <div class="money-label">Total Net Salary</div>
+                            <div class="money-value">
+                                Rs.
+                                <span th:text="${monthlyNetSalary != null ? #numbers.formatDecimal(monthlyNetSalary, 1, 'COMMA', 2, 'POINT') : '0.00'}">
+                                    0.00
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="money-card">
+                            <div class="money-label">Total Allowances</div>
+                            <div class="money-value">
+                                Rs.
+                                <span th:text="${monthlyAllowances != null ? #numbers.formatDecimal(monthlyAllowances, 1, 'COMMA', 2, 'POINT') : '0.00'}">
+                                    0.00
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="money-card">
+                            <div class="money-label">Total Deductions</div>
+                            <div class="money-value">
+                                Rs.
+                                <span th:text="${monthlyDeductions != null ? #numbers.formatDecimal(monthlyDeductions, 1, 'COMMA', 2, 'POINT') : '0.00'}">
+                                    0.00
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="money-card">
+                            <div class="money-label">Total Tax</div>
+                            <div class="money-value">
+                                Rs.
+                                <span th:text="${monthlyTax != null ? #numbers.formatDecimal(monthlyTax, 1, 'COMMA', 2, 'POINT') : '0.00'}">
+                                    0.00
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="money-card">
+                            <div class="money-label">Payroll Records</div>
+                            <div class="money-value"
+                                 th:text="${monthlyPayrollCount != null ? monthlyPayrollCount : 0}">0</div>
+                        </div>
+
+                        <div class="money-card">
+                            <div class="money-label">Employees Without Payroll</div>
+                            <div class="money-value"
+                                 th:text="${employeesWithoutPayroll != null ? employeesWithoutPayroll : 0}">0</div>
+                        </div>
+
+                    </div>
+
+                    <div class="summary-note"
+                         th:if="${employeesWithoutPayroll != null && employeesWithoutPayroll > 0}">
+                        <strong>Payroll records require attention.</strong>
+                        <span th:text="${employeesWithoutPayroll}">0</span>
+                        employee(s) do not yet have a payroll record for this month.
+                        <a href="/payroll" class="text-link">Review payroll →</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MONTHLY ATTENDANCE SUMMARY -->
+            <div class="section-title">
+                <div>
+                    <h2>Monthly Attendance Summary</h2>
+                    <p>Recorded attendance for the current month</p>
+                </div>
+                <a href="/attendance" class="text-link">View Records →</a>
+            </div>
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Attendance Records</span>
+                        <span class="stat-icon icon-blue">▤</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${monthlyAttendanceTotal != null ? monthlyAttendanceTotal : 0}">0</div>
+                    <div class="stat-foot">Current month records</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Present / Late Records</span>
+                        <span class="stat-icon icon-green">✓</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${monthlyPresent != null ? monthlyPresent : 0}">0</div>
+                    <div class="stat-foot">Present and late statuses</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Absent Records</span>
+                        <span class="stat-icon" style="background:#fee2e2;color:#b91c1c;">×</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${monthlyAbsent != null ? monthlyAbsent : 0}">0</div>
+                    <div class="stat-foot">Recorded absences</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Leave Records</span>
+                        <span class="stat-icon icon-orange">↗</span>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${monthlyLeave != null ? monthlyLeave : 0}">0</div>
+                    <div class="stat-foot">Recorded leave statuses</div>
+                </div>
+
+            </section>
+
+            <!-- RECENT ATTENDANCE -->
+            <div class="section-title">
+                <div>
+                    <h2>Recent Attendance</h2>
+                    <p>Latest attendance records from the database</p>
+                </div>
+                <a href="/attendance" class="text-link">View All →</a>
+            </div>
+
+            <section class="panel">
+                <div class="table-scroll">
+
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr th:if="${recentAttendanceList == null || recentAttendanceList.isEmpty()}">
+                            <td colspan="6" class="empty-state">
+                                No attendance records are available.
+                            </td>
+                        </tr>
+
+                        <tr th:each="attendance : ${recentAttendanceList}">
+
+                            <td>
+                                <div class="employee-cell">
+                                    <div class="employee-avatar"
+                                         th:text="${employeeNames != null && employeeNames.get(attendance.employeeId) != null && !employeeNames.get(attendance.employeeId).isEmpty() ? #strings.substring(employeeNames.get(attendance.employeeId), 0, 1).toUpperCase() : 'E'}">
+                                        E
+                                    </div>
+
+                                    <div>
+                                        <div class="employee-name"
+                                             th:text="${employeeNames != null && employeeNames.get(attendance.employeeId) != null ? employeeNames.get(attendance.employeeId) : 'Employee'}">
+                                            Employee
+                                        </div>
+                                        <div class="employee-sub">Attendance record</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td th:text="${attendance.employeeId}">1</td>
+
+                            <td th:text="${attendance.attendanceDate != null ? #temporals.format(attendance.attendanceDate, 'yyyy-MM-dd') : '-'}">
+                                2026-10-01
+                            </td>
+
+                            <td th:text="${attendance.checkIn != null ? attendance.checkIn : '-'}">-</td>
+
+                            <td th:text="${attendance.checkOut != null ? attendance.checkOut : '-'}">-</td>
+
+                            <td>
+                                <span class="status"
+                                      th:classappend="${attendance.status != null && attendance.status.toString().equalsIgnoreCase('PRESENT') ? ' status-present' : (attendance.status != null && attendance.status.toString().equalsIgnoreCase('LATE') ? ' status-late' : (attendance.status != null && attendance.status.toString().equalsIgnoreCase('ABSENT') ? ' status-absent' : (attendance.status != null && attendance.status.toString().equalsIgnoreCase('LEAVE') ? ' status-leave' : ' status-other')))}"
+                                      th:text="${attendance.status != null ? attendance.status : 'UNKNOWN'}">
+                                    PRESENT
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </section>
+
+            <footer class="footer">
+                © Smart Attendance &amp; Payroll System<br>
+                Administration Management Portal
+            </footer>
+
+        </div>
+    </main>
+</div>
+
+<!-- CHART DATA FROM EXISTING DASHBOARD CONTROLLER -->
+<div id="attendanceChartData"
+     hidden
+     th:attr="data-labels=${#strings.listJoin(attendanceLabels, '|')},
+              data-present=${#strings.listJoin(attendancePresentData, '|')},
+              data-absent=${#strings.listJoin(attendanceAbsentData, '|')},
+              data-leave=${#strings.listJoin(attendanceLeaveData, '|')}">
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+    const dateElement = document.getElementById('currentDate');
+
+    function setSidebarOpen(open) {
+        if (!sidebar || !menuToggle || !overlay) return;
+
+        sidebar.classList.toggle('open', open);
+        overlay.classList.toggle('show', open);
+        menuToggle.setAttribute('aria-expanded', String(open));
+        menuToggle.setAttribute(
+            'aria-label',
+            open ? 'Close navigation' : 'Open navigation'
+        );
+    }
+
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function () {
+            setSidebarOpen(!sidebar.classList.contains('open'));
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            setSidebarOpen(false);
+        });
+    }
+
+    document.querySelectorAll('.sidebar .nav-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 760) setSidebarOpen(false);
+        });
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') setSidebarOpen(false);
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 760) setSidebarOpen(false);
+    });
+
+    if (dateElement) {
+        dateElement.textContent = new Intl.DateTimeFormat('en', {
+            weekday:'short',
+            year:'numeric',
+            month:'short',
+            day:'numeric'
+        }).format(new Date());
+    }
+
+    /* Build chart using existing Thymeleaf data */
+    const canvas = document.getElementById('attendanceChart');
+    const dataElement = document.getElementById('attendanceChartData');
+    const emptyState = document.getElementById('chartEmptyState');
+
+    if (!canvas || !dataElement || typeof Chart === 'undefined') {
+        if (canvas && emptyState) {
+            canvas.hidden = true;
+            emptyState.hidden = false;
+            emptyState.textContent = 'Chart library is unavailable.';
+        }
+        return;
+    }
+
+    function readArray(attributeName, convertToNumber) {
+        const raw = dataElement.getAttribute(attributeName);
+
+        if (!raw || !raw.trim()) return [];
+
+        return raw.split('|').map(function (value) {
+            const trimmed = value.trim();
+            return convertToNumber ? (Number(trimmed) || 0) : trimmed;
+        });
+    }
+
+    const labels = readArray('data-labels', false);
+    const present = readArray('data-present', true);
+    const absent = readArray('data-absent', true);
+    const leave = readArray('data-leave', true);
+
+    if (labels.length === 0) {
+        canvas.hidden = true;
+        if (emptyState) emptyState.hidden = false;
+        return;
+    }
+
+    if (emptyState) emptyState.hidden = true;
+
+    new Chart(canvas, {
+        type:'line',
+        data:{
+            labels:labels,
+            datasets:[
+                {
+                    label:'Present / Late',
+                    data:present,
+                    borderColor:'#059669',
+                    backgroundColor:'rgba(5,150,105,.10)',
+                    borderWidth:2.5,
+                    pointRadius:3,
+                    pointHoverRadius:5,
+                    pointBackgroundColor:'#059669',
+                    tension:.35,
+                    fill:true
+                },
+                {
+                    label:'Absent',
+                    data:absent,
+                    borderColor:'#dc2626',
+                    backgroundColor:'rgba(220,38,38,.06)',
+                    borderWidth:2,
+                    pointRadius:2.5,
+                    pointHoverRadius:5,
+                    tension:.35,
+                    fill:false
+                },
+                {
+                    label:'Leave',
+                    data:leave,
+                    borderColor:'#d97706',
+                    backgroundColor:'rgba(217,119,6,.06)',
+                    borderWidth:2,
+                    pointRadius:2.5,
+                    pointHoverRadius:5,
+                    tension:.35,
+                    fill:false
+                }
+            ]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            interaction:{intersect:false,mode:'index'},
+            plugins:{
+                legend:{
+                    position:'bottom',
+                    labels:{
+                        usePointStyle:true,
+                        boxWidth:7,
+                        padding:17,
+                        font:{family:'Inter',size:10}
+                    }
+                },
+                tooltip:{
+                    backgroundColor:'#111827',
+                    padding:11,
+                    cornerRadius:8,
+                    titleFont:{family:'Inter',size:11},
+                    bodyFont:{family:'Inter',size:10}
+                }
+            },
+            scales:{
+                x:{
+                    grid:{display:false},
+                    ticks:{font:{family:'Inter',size:9}}
+                },
+                y:{
+                    beginAtZero:true,
+                    ticks:{
+                        precision:0,
+                        font:{family:'Inter',size:9}
+                    },
+                    grid:{color:'#f0f2f5'}
+                }
+            }
+        }
+    });
+})();
+</script>
+
+</body>
+</html>

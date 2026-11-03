@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Overtime | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f5f6fc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e8eaf2;
+            padding: 16px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .brand h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .brand p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #64748b;
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #f1f0ff;
+            color: #4f46e5;
+        }
+
+        .nav-links a.active {
+            background: #eeedff;
+            color: #4f46e5;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1050px;
+            margin: 35px auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #4f46e5;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+            font-weight: 800;
+            color: #172554;
+            letter-spacing: -0.7px;
+        }
+
+        .page-header p {
+            margin-top: 8px;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #eaecf3;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .error-message {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            color: #be123c;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .info-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #f0f5ff;
+            border: 1px solid #dbeafe;
+            color: #1d4ed8;
+            padding: 15px 17px;
+            border-radius: 11px;
+            margin-bottom: 28px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .info-icon {
+            width: 25px;
+            height: 25px;
+            flex-shrink: 0;
+            background: #dbeafe;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #eef0f5;
+        }
+
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: #eeedff;
+            color: #5b4de3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .section-heading h3 {
+            color: #1e293b;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .section-heading p {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 21px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #dfe3ed;
+            border-radius: 9px;
+            font-size: 13px;
+            color: #334155;
+            background: #ffffff;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:hover,
+        select:hover,
+        textarea:hover {
+            border-color: #b8b5f5;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #6961e8;
+            box-shadow: 0 0 0 3px rgba(99, 91, 220, 0.10);
+        }
+
+        input[readonly] {
+            cursor: not-allowed;
+        }
+
+        textarea {
+            min-height: 105px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .field-hint {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 7px;
+        }
+
+        .amount-box input {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #15803d;
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .amount-box label {
+            color: #15803d;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid #eef0f5;
+            padding-top: 23px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 21px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .cancel-btn {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .cancel-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #5146df, #7045d9);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(91, 70, 220, 0.2);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(91, 70, 220, 0.25);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px 15px;
+            color: #a0a8b8;
+            font-size: 11px;
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                padding: 14px 4%;
+            }
+
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 3px;
+            }
+
+            .nav-links a {
+                white-space: nowrap;
+            }
+
+            .container {
+                margin: 25px auto;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .brand h2 {
+                font-size: 14px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 17px;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .form-card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="brand">
+        <div class="brand-icon">S</div>
+        <div>
+            <h2>Smart Attendance & Payroll</h2>
+            <p>Administration Management Portal</p>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/employees">Employees</a>
+        <a href="/attendance">Attendance</a>
+        <a href="/payroll">Payroll</a>
+        <a href="/holidays">Holidays</a>
+        <a href="/overtime" class="active">Overtime</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="breadcrumb">
+        <a href="/dashboard">Dashboard</a>
+        <span>/</span>
+        <a href="/overtime">Overtime</a>
+        <span>/</span>
+        <span>Edit Overtime</span>
+    </div>
+
+    <div class="page-header">
+        <h1>Edit Overtime</h1>
+        <p>Update employee overtime details and review the calculated overtime amount.</p>
+    </div>
+
+    <div class="form-card">
+
+        <div th:if="${errorMessage != null}"
+             class="error-message"
+             th:text="${errorMessage}">
+        </div>
+
+        <div class="info-box">
+            <div class="info-icon">i</div>
+            <div>
+                <strong>Overtime Calculation</strong><br>
+                OT Amount = <strong>OT Hours × OT Rate</strong>.
+                The overtime amount is automatically calculated when hours or rate changes.
+            </div>
+        </div>
+
+        <form th:action="@{/overtime/update}" method="post">
+
+            <input type="hidden"
+                   name="otId"
+                   th:value="${overtime.otId}">
+
+            <div class="form-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">👤</div>
+                    <div>
+                        <h3>Employee Information</h3>
+                        <p>Select the employee assigned to this overtime record.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="employeeId">Employee</label>
+
+                        <select id="employeeId"
+                                name="employeeId"
+                                required>
+
+                            <option th:each="employee : ${employees}"
+                                    th:value="${employee.employeeId}"
+                                    th:text="${employee.employeeCode + ' - ' + employee.fullName}"
+                                    th:selected="${employee.employeeId == overtime.employeeId}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">⏱</div>
+                    <div>
+                        <h3>Overtime Information</h3>
+                        <p>Update overtime date, category, hours and payment rate.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="otDate">OT Date</label>
+                        <input type="date"
+                               id="otDate"
+                               name="otDate"
+                               th:value="${overtime.otDate}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otType">OT Type</label>
+                        <select id="otType"
+                                name="otType"
+                                required>
+
+                            <option value="WEEKDAY"
+                                    th:selected="${overtime.otType == 'WEEKDAY'}">
+                                Weekday OT
+                            </option>
+
+                            <option value="WEEKEND"
+                                    th:selected="${overtime.otType == 'WEEKEND'}">
+                                Weekend OT
+                            </option>
+
+                            <option value="HOLIDAY"
+                                    th:selected="${overtime.otType == 'HOLIDAY'}">
+                                Holiday OT
+                            </option>
+
+                            <option value="OTHER"
+                                    th:selected="${overtime.otType == 'OTHER'}">
+                                Other
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otHours">OT Hours</label>
+                        <input type="number"
+                               id="otHours"
+                               name="otHours"
+                               step="0.01"
+                               min="0.01"
+                               th:value="${overtime.otHours}"
+                               required
+                               oninput="calculateAmount()">
+                        <span class="field-hint">Enter overtime hours.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otRate">OT Rate (Rs.)</label>
+                        <input type="number"
+                               id="otRate"
+                               name="otRate"
+                               step="0.01"
+                               min="0.01"
+                               th:value="${overtime.otRate}"
+                               required
+                               oninput="calculateAmount()">
+                        <span class="field-hint">Payment rate per overtime hour.</span>
+                    </div>
+
+                    <div class="form-group amount-box">
+                        <label for="otAmount">OT Amount (Rs.)</label>
+                        <input type="number"
+                               id="otAmount"
+                               name="otAmount"
+                               step="0.01"
+                               th:value="${overtime.otAmount}"
+                               readonly>
+                        <span class="field-hint">Automatically calculated amount.</span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+                        <textarea id="description"
+                                  name="description"
+                                  th:text="${overtime.description}"
+                                  placeholder="Enter additional overtime details..."></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-actions">
+
+                <a href="/overtime" class="btn cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn save-btn">
+                    ✓ Update Overtime
+                </button>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="footer">
+    Smart Attendance & Payroll System © 2026
+</div>
+
+<script>
+    function calculateAmount() {
+        const hours =
+            parseFloat(
+                document.getElementById("otHours").value
+            ) || 0;
+
+        const rate =
+            parseFloat(
+                document.getElementById("otRate").value
+            ) || 0;
+
+        document.getElementById("otAmount").value =
+            (hours * rate).toFixed(2);
+    }
+</script>
+
+</body>
+</html>

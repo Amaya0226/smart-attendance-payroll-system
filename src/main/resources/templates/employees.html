@@ -1,0 +1,1086 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Management | Smart Attendance &amp; Payroll</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --navy: #111c35;
+            --text: #172033;
+            --muted: #718096;
+            --border: #e7ebf3;
+            --background: #f5f7fc;
+            --white: #ffffff;
+            --success: #15803d;
+            --danger: #dc2626;
+            --shadow: 0 6px 24px rgba(23, 32, 51, 0.055);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+
+        .navbar {
+            background: var(--navy);
+            color: white;
+            min-height: 74px;
+            padding: 0 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 18px rgba(17, 28, 53, 0.13);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+
+        .brand-icon {
+            width: 37px;
+            height: 37px;
+            border-radius: 11px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #818cf8, #4f46e5);
+            font-size: 19px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #dbe4f3;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-links a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main */
+
+        .container {
+            width: 94%;
+            max-width: 1500px;
+            margin: 35px auto;
+        }
+
+        .breadcrumb {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 18px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            color: var(--text);
+        }
+
+        .page-header p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .add-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 12px 19px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.18);
+        }
+
+        .add-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Messages */
+
+        .message {
+            padding: 14px 17px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .success-message {
+            background: #eaf8ef;
+            color: #166534;
+            border: 1px solid #bbebca;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Search */
+
+        .search-box {
+            background: white;
+            padding: 19px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            margin-bottom: 21px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-heading {
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .search-box form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 14px;
+            border: 1px solid #dce2ec;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            color: var(--text);
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .search-btn,
+        .clear-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 11px 19px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .search-btn {
+            background: var(--navy);
+            color: white;
+            border: none;
+        }
+
+        .search-btn:hover {
+            background: #273858;
+        }
+
+        .clear-btn {
+            background: #eef1f7;
+            color: #475569;
+        }
+
+        .clear-btn:hover {
+            background: #e1e6ef;
+        }
+
+        /* Table */
+
+        .table-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 19px 21px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-heading h2 {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .table-heading p {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1500px;
+        }
+
+        thead {
+            background: #f5f7fc;
+        }
+
+        th {
+            padding: 15px 13px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 800;
+            color: #596579;
+            letter-spacing: 0.45px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 11px;
+            color: #3d485b;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .employee-code {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .employee-name {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .salary-value {
+            font-weight: 700;
+            color: #273777;
+        }
+
+        /* Status */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .active {
+            background: #e5f8ee;
+            color: #167347;
+        }
+
+        .inactive {
+            background: #feecec;
+            color: #b42318;
+        }
+
+        /* Action Buttons */
+
+        .action-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 700;
+            margin: 2px 3px 2px 0;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .edit-btn {
+            background: #fff4db;
+            color: #9a6500;
+        }
+
+        .edit-btn:hover {
+            background: #ffe8b0;
+        }
+
+        .delete-btn {
+            background: #feecec;
+            color: #b42318;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+        }
+
+        .qr-btn {
+            background: #f0eaff;
+            color: #6d28d9;
+        }
+
+        .qr-btn:hover {
+            background: #e4d8ff;
+        }
+
+        .email-btn {
+            background: #e8efff;
+            color: #2455a6;
+        }
+
+        .email-btn:hover {
+            background: #d8e4ff;
+        }
+
+        .salary-btn {
+            background: #e3f7ef;
+            color: #08764e;
+        }
+
+        .salary-btn:hover {
+            background: #c9f0df;
+        }
+
+        /* Empty State */
+
+        .no-records {
+            text-align: center;
+            padding: 45px 20px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* QR Modal */
+
+        .qr-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background: rgba(12, 20, 39, 0.7);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .qr-modal-content {
+            background: white;
+            width: 390px;
+            max-width: 100%;
+            padding: 30px;
+            border-radius: 17px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            animation: modalEnter 0.2s ease;
+        }
+
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .qr-modal-content h2 {
+            color: var(--text);
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .qr-modal-content p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        .qr-code-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 220px;
+            margin-bottom: 17px;
+            background: #f8f9fc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .qr-code-box img,
+        .qr-code-box canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .employee-code-display {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .qr-modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .download-btn,
+        .close-btn {
+            border: none;
+            padding: 11px 17px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .download-btn {
+            background: #15803d;
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: #166534;
+        }
+
+        .close-btn {
+            background: #eef1f7;
+            color: #475569;
+        }
+
+        .close-btn:hover {
+            background: #e1e6ef;
+        }
+
+        /* Footer */
+
+        footer {
+            text-align: center;
+            color: #8993a5;
+            font-size: 10px;
+            margin: 40px 0 20px;
+            padding: 0 15px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 900px) {
+            .navbar {
+                padding: 16px 4%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .nav-links {
+                width: 100%;
+            }
+
+            .container {
+                width: 95%;
+                margin-top: 27px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .brand {
+                font-size: 12px;
+                white-space: normal;
+            }
+
+            .nav-links {
+                gap: 4px;
+            }
+
+            .nav-links a {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+
+            .search-box {
+                padding: 15px;
+            }
+
+            .search-box form {
+                flex-direction: column;
+            }
+
+            .search-btn,
+            .clear-btn {
+                width: 100%;
+            }
+
+            .table-heading {
+                padding: 16px;
+            }
+
+            .qr-modal-content {
+                padding: 24px 17px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="brand">
+            <div class="brand-icon">✓</div>
+            <span>Smart Attendance &amp; Payroll System</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a th:href="@{/dashboard}">Dashboard</a>
+
+            <a th:href="@{/employees}" class="active">Employees</a>
+
+            <a th:href="@{/attendance}">Attendance</a>
+
+            <a th:href="@{/payroll}">Payroll</a>
+
+        </div>
+
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <div class="breadcrumb">
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <span> / Employee Management</span>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+
+            <div>
+                <h1>Employee Management</h1>
+                <p>
+                    Manage employee profiles, employment information,
+                    QR codes and salary history.
+                </p>
+            </div>
+
+            <a th:href="@{/employees/add}" class="add-btn">
+                <span>＋</span> Add New Employee
+            </a>
+
+        </div>
+
+        <!-- Email Success Message -->
+        <div
+            th:if="${param.emailSuccess}"
+            class="message success-message"
+            role="status">
+
+            ✓ QR code sent successfully to the employee's registered email address.
+
+        </div>
+
+        <!-- Email Error Message -->
+        <div
+            th:if="${param.emailError}"
+            class="message error-message"
+            role="alert">
+
+            ✗
+            <span th:text="${param.emailError}">
+                Failed to send QR code.
+            </span>
+
+        </div>
+
+        <!-- Search -->
+        <section class="search-box">
+
+            <div class="search-heading">Search Employees</div>
+
+            <form th:action="@{/employees/search}" method="get">
+
+                <input
+                    type="text"
+                    name="keyword"
+                    th:value="${keyword}"
+                    placeholder="Search by employee code or name..."
+                    aria-label="Search employees">
+
+                <button type="submit" class="search-btn">
+                    Search
+                </button>
+
+                <a th:href="@{/employees}" class="clear-btn">
+                    Clear
+                </a>
+
+            </form>
+
+        </section>
+
+        <!-- Employee Table -->
+        <section class="table-section">
+
+            <div class="table-heading">
+                <div>
+                    <h2>Employee Records</h2>
+                    <p>Employee details and available management actions</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Employee Code</th>
+                            <th>Full Name</th>
+                            <th>NIC</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Job Position</th>
+                            <th>Basic Salary</th>
+                            <th>Joining Date</th>
+                            <th>Status</th>
+                            <th>QR Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <!-- Employee Records -->
+                        <tr th:each="employee : ${employees}">
+
+                            <td th:text="${employee.employeeId}">1</td>
+
+                            <td>
+                                <span class="employee-code"
+                                      th:text="${employee.employeeCode}">
+                                    EMP001
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="employee-name"
+                                      th:text="${employee.fullName}">
+                                    Employee Name
+                                </span>
+                            </td>
+
+                            <td th:text="${employee.nic}">123456789V</td>
+
+                            <td th:text="${employee.email}">
+                                employee@email.com
+                            </td>
+
+                            <td th:text="${employee.phone}">
+                                0771234567
+                            </td>
+
+                            <td th:text="${employee.department}">IT</td>
+
+                            <td th:text="${employee.jobPosition}">
+                                Software Developer
+                            </td>
+
+                            <td>
+                                <span class="salary-value">
+                                    Rs.
+                                    <span th:text="${#numbers.formatDecimal(employee.basicSalary, 1, 2)}">
+                                        50000.00
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td th:text="${employee.joiningDate}">
+                                2026-01-01
+                            </td>
+
+                            <!-- Employee Status -->
+                            <td>
+
+                                <span
+                                    th:if="${employee.status != null and employee.status.name() == 'ACTIVE'}"
+                                    class="status active">
+                                    ACTIVE
+                                </span>
+
+                                <span
+                                    th:if="${employee.status != null and employee.status.name() == 'INACTIVE'}"
+                                    class="status inactive">
+                                    INACTIVE
+                                </span>
+
+                                <span
+                                    th:if="${employee.status == null}"
+                                    class="status inactive">
+                                    UNKNOWN
+                                </span>
+
+                            </td>
+
+                            <!-- QR Code Actions -->
+                            <td>
+
+                                <button
+                                    type="button"
+                                    class="action-btn qr-btn"
+                                    th:attr="data-code=${employee.employeeCode},data-name=${employee.fullName}"
+                                    onclick="generateEmployeeQR(this)">
+
+                                    Generate QR
+
+                                </button>
+
+                                <a
+                                    th:href="@{/employees/send-qr/{id}(id=${employee.employeeId})}"
+                                    class="action-btn email-btn"
+                                    onclick="return confirm('Send this employee QR code to the registered email address?');">
+
+                                    Send QR
+
+                                </a>
+
+                            </td>
+
+                            <!-- Employee Actions -->
+                            <td>
+
+                                <a
+                                    th:href="@{/employees/edit/{id}(id=${employee.employeeId})}"
+                                    class="action-btn edit-btn">
+
+                                    Edit
+
+                                </a>
+
+                                <a
+                                    th:href="@{/employees/delete/{id}(id=${employee.employeeId})}"
+                                    class="action-btn delete-btn"
+                                    onclick="return confirm('Are you sure you want to delete this employee?');">
+
+                                    Delete
+
+                                </a>
+
+                                <!-- Salary History -->
+                                <a
+                                    th:href="@{/salary-revisions/history/{id}(id=${employee.employeeId})}"
+                                    class="action-btn salary-btn">
+
+                                    Salary History
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        <!-- No Records -->
+                        <tr th:if="${#lists.isEmpty(employees)}">
+
+                            <td colspan="13" class="no-records">
+                                No employee records found.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- QR Modal -->
+    <div
+        id="qrModal"
+        class="qr-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="qrModalTitle">
+
+        <div class="qr-modal-content">
+
+            <h2 id="qrModalTitle">Employee QR Code</h2>
+
+            <p id="qrEmployeeName">Employee</p>
+
+            <div id="qrCode" class="qr-code-box"></div>
+
+            <div id="qrEmployeeCode" class="employee-code-display">
+                EMP001
+            </div>
+
+            <div class="qr-modal-buttons">
+
+                <button
+                    type="button"
+                    class="download-btn"
+                    onclick="downloadEmployeeQR()">
+
+                    Download QR
+
+                </button>
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    onclick="closeQRModal()">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        Smart Attendance &amp; Payroll System &copy; 2026
+    </footer>
+
+    <!-- QR JavaScript -->
+    <script>
+        let currentEmployeeCode = "";
+
+        function generateEmployeeQR(button) {
+            const employeeCode = button.getAttribute("data-code");
+            const employeeName = button.getAttribute("data-name");
+
+            if (!employeeCode) {
+                alert("Employee code is not available.");
+                return;
+            }
+
+            if (typeof QRCode === "undefined") {
+                alert("QR Code library could not be loaded. Please check your internet connection and try again.");
+                return;
+            }
+
+            currentEmployeeCode = employeeCode;
+
+            document.getElementById("qrEmployeeName").textContent =
+                employeeName || "Employee";
+
+            document.getElementById("qrEmployeeCode").textContent =
+                employeeCode;
+
+            const qrContainer = document.getElementById("qrCode");
+            qrContainer.innerHTML = "";
+
+            new QRCode(qrContainer, {
+                text: employeeCode,
+                width: 200,
+                height: 200,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById("qrModal").style.display = "flex";
+        }
+
+        function closeQRModal() {
+            document.getElementById("qrModal").style.display = "none";
+        }
+
+        function downloadEmployeeQR() {
+            const qrContainer = document.getElementById("qrCode");
+            const qrImage = qrContainer.querySelector("img");
+            const qrCanvas = qrContainer.querySelector("canvas");
+
+            let imageUrl = "";
+
+            if (qrImage && qrImage.src) {
+                imageUrl = qrImage.src;
+            } else if (qrCanvas) {
+                imageUrl = qrCanvas.toDataURL("image/png");
+            }
+
+            if (!imageUrl) {
+                alert("QR code is not available. Please generate the QR code first.");
+                return;
+            }
+
+            const link = document.createElement("a");
+            link.href = imageUrl;
+            link.download = "QR_" + currentEmployeeCode + ".png";
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /* Close modal when clicking outside */
+        window.addEventListener("click", function(event) {
+            const modal = document.getElementById("qrModal");
+
+            if (event.target === modal) {
+                closeQRModal();
+            }
+        });
+
+        /* Close modal with Escape key */
+        window.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                closeQRModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

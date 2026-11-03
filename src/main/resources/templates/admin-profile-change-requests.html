@@ -1,0 +1,555 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Change Requests | Smart Attendance &amp; Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --primary:#4f46e5;
+            --primary-dark:#3730a3;
+            --bg:#f5f7fb;
+            --text:#111827;
+            --muted:#6b7280;
+            --border:#e5e7eb;
+            --green:#059669;
+            --red:#dc2626;
+            --orange:#d97706;
+        }
+
+        * { box-sizing:border-box; }
+
+        body {
+            margin:0;
+            background:var(--bg);
+            color:var(--text);
+            font-family:'Inter',Arial,sans-serif;
+        }
+
+        a { text-decoration:none; }
+
+        .topbar {
+            min-height:70px;
+            padding:15px 30px;
+            background:#fff;
+            border-bottom:1px solid var(--border);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:15px;
+        }
+
+        .brand {
+            font-size:14px;
+            font-weight:800;
+        }
+
+        .brand small {
+            display:block;
+            color:var(--muted);
+            font-size:10px;
+            margin-top:5px;
+            font-weight:500;
+        }
+
+        .back-link {
+            color:var(--primary);
+            font-size:11px;
+            font-weight:700;
+        }
+
+        .container {
+            max-width:1500px;
+            margin:auto;
+            padding:28px 25px;
+        }
+
+        .page-heading {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:15px;
+            margin-bottom:24px;
+        }
+
+        h1 {
+            font-size:23px;
+            margin:0;
+            font-weight:800;
+        }
+
+        .subtitle {
+            font-size:11px;
+            color:var(--muted);
+            margin-top:8px;
+            line-height:1.7;
+        }
+
+        .summary-grid {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:15px;
+            margin-bottom:24px;
+        }
+
+        .summary-card {
+            background:#fff;
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:20px;
+            box-shadow:0 3px 15px rgba(15,23,42,.04);
+        }
+
+        .summary-label {
+            font-size:10px;
+            color:var(--muted);
+            font-weight:600;
+        }
+
+        .summary-value {
+            font-size:28px;
+            font-weight:800;
+            margin-top:12px;
+        }
+
+        .pending { color:var(--orange); }
+        .approved { color:var(--green); }
+        .rejected { color:var(--red); }
+
+        .alert {
+            padding:14px 16px;
+            border-radius:10px;
+            font-size:11px;
+            line-height:1.7;
+            margin-bottom:18px;
+        }
+
+        .alert-success {
+            background:#ecfdf5;
+            border:1px solid #a7f3d0;
+            color:#065f46;
+        }
+
+        .alert-error {
+            background:#fef2f2;
+            border:1px solid #fecaca;
+            color:#991b1b;
+        }
+
+        .panel {
+            background:#fff;
+            border:1px solid var(--border);
+            border-radius:14px;
+            overflow:hidden;
+            box-shadow:0 3px 15px rgba(15,23,42,.04);
+        }
+
+        .panel-header {
+            padding:19px 21px;
+            border-bottom:1px solid var(--border);
+        }
+
+        .panel-header h2 {
+            margin:0;
+            font-size:13px;
+            font-weight:800;
+        }
+
+        .panel-header p {
+            color:var(--muted);
+            font-size:10px;
+            margin:6px 0 0;
+        }
+
+        .table-scroll { overflow-x:auto; }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+            min-width:1100px;
+        }
+
+        th {
+            padding:14px;
+            text-align:left;
+            background:#f8fafc;
+            color:#6b7280;
+            font-size:9px;
+            text-transform:uppercase;
+            letter-spacing:.6px;
+            white-space:nowrap;
+        }
+
+        td {
+            padding:15px 14px;
+            border-top:1px solid #f0f2f5;
+            font-size:10px;
+            vertical-align:top;
+            line-height:1.8;
+        }
+
+        tbody tr:hover { background:#fafbff; }
+
+        .employee-name {
+            font-weight:800;
+            color:#1f2937;
+        }
+
+        .employee-code {
+            color:var(--muted);
+            font-size:9px;
+            margin-top:4px;
+        }
+
+        .value-old { color:#6b7280; }
+        .value-new { color:#047857; font-weight:700; }
+
+        .reason {
+            max-width:180px;
+            white-space:normal;
+            overflow-wrap:anywhere;
+        }
+
+        .status {
+            display:inline-block;
+            padding:6px 9px;
+            border-radius:20px;
+            font-size:9px;
+            font-weight:800;
+        }
+
+        .status-pending { background:#fef3c7; color:#92400e; }
+        .status-approved { background:#d1fae5; color:#047857; }
+        .status-rejected { background:#fee2e2; color:#b91c1c; }
+
+        .action-box {
+            min-width:210px;
+            display:flex;
+            flex-direction:column;
+            gap:9px;
+        }
+
+        .action-form {
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+        }
+
+        .action-form input {
+            width:100%;
+            border:1px solid var(--border);
+            padding:9px;
+            border-radius:7px;
+            font-family:inherit;
+            font-size:9px;
+            outline:none;
+        }
+
+        .action-form input:focus {
+            border-color:#818cf8;
+            box-shadow:0 0 0 3px #eef2ff;
+        }
+
+        .btn {
+            border:0;
+            border-radius:7px;
+            padding:9px 12px;
+            color:white;
+            font-size:9px;
+            font-weight:800;
+            cursor:pointer;
+        }
+
+        .btn-approve { background:#059669; }
+        .btn-approve:hover { background:#047857; }
+        .btn-reject { background:#dc2626; }
+        .btn-reject:hover { background:#b91c1c; }
+
+        .reviewed-remarks {
+            color:var(--muted);
+            font-size:9px;
+            margin-top:7px;
+            max-width:180px;
+            white-space:normal;
+        }
+
+        .empty-state {
+            text-align:center;
+            padding:55px 20px;
+            color:var(--muted);
+            font-size:11px;
+        }
+
+        .footer {
+            text-align:center;
+            color:#9ca3af;
+            font-size:9px;
+            padding:25px 10px;
+        }
+
+        @media(max-width:700px) {
+            .topbar { padding:14px 16px; }
+            .container { padding:22px 13px; }
+            .page-heading { align-items:flex-start; flex-direction:column; }
+            h1 { font-size:20px; }
+            .summary-grid { grid-template-columns:1fr; gap:10px; }
+            .summary-card { padding:16px; }
+            .summary-value { font-size:24px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        Smart Attendance &amp; Payroll
+        <small>Administration Management Portal</small>
+    </div>
+
+    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <div>
+            <h1>Profile Change Requests</h1>
+            <div class="subtitle">
+                Review employee contact detail changes and approve or reject requests.
+            </div>
+        </div>
+    </section>
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="alert alert-success"
+         th:if="${successMessage != null}"
+         th:text="${successMessage}">
+        Request processed successfully.
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <div class="alert alert-error"
+         th:if="${errorMessage != null}"
+         th:text="${errorMessage}">
+        An error occurred.
+    </div>
+
+    <!-- SUMMARY -->
+    <section class="summary-grid">
+
+        <div class="summary-card">
+            <div class="summary-label">Pending Requests</div>
+            <div class="summary-value pending"
+                 th:text="${pendingCount}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Approved Requests</div>
+            <div class="summary-value approved"
+                 th:text="${approvedCount}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-label">Rejected Requests</div>
+            <div class="summary-value rejected"
+                 th:text="${rejectedCount}">0</div>
+        </div>
+
+    </section>
+
+    <!-- REQUEST TABLE -->
+    <section class="panel">
+
+        <div class="panel-header">
+            <h2>Employee Profile Requests</h2>
+            <p>All submitted requests, including pending and reviewed requests.</p>
+        </div>
+
+        <div class="table-scroll">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Current Phone</th>
+                    <th>Requested Phone</th>
+                    <th>Current Address</th>
+                    <th>Requested Address</th>
+                    <th>Reason</th>
+                    <th>Requested At</th>
+                    <th>Status</th>
+                    <th>Admin Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:if="${requests == null || requests.isEmpty()}">
+                    <td colspan="9">
+                        <div class="empty-state">
+                            <h3>No Profile Change Requests</h3>
+                            <p>Employee requests will appear here.</p>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:each="request : ${requests}">
+
+                    <!-- EMPLOYEE -->
+                    <td>
+                        <div class="employee-name"
+                             th:text="${employeeNames[request.employeeId] != null
+                                ? employeeNames[request.employeeId]
+                                : 'Employee not found'}">
+                            Employee
+                        </div>
+
+                        <div class="employee-code"
+                             th:text="${employeeCodes[request.employeeId] != null
+                                ? employeeCodes[request.employeeId]
+                                : 'N/A'}">
+                            EMP001
+                        </div>
+                    </td>
+
+                    <!-- CURRENT PHONE -->
+                    <td>
+                        <span class="value-old"
+                              th:text="${currentPhones[request.employeeId] != null
+                                ? currentPhones[request.employeeId]
+                                : '-'}">-</span>
+                    </td>
+
+                    <!-- REQUESTED PHONE -->
+                    <td>
+                        <span class="value-new"
+                              th:text="${request.requestedPhone != null
+                                && !#strings.isEmpty(request.requestedPhone)
+                                ? request.requestedPhone : '-'}">-</span>
+                    </td>
+
+                    <!-- CURRENT ADDRESS -->
+                    <td>
+                        <span class="value-old"
+                              th:text="${currentAddresses[request.employeeId] != null
+                                ? currentAddresses[request.employeeId]
+                                : '-'}">-</span>
+                    </td>
+
+                    <!-- REQUESTED ADDRESS -->
+                    <td>
+                        <span class="value-new"
+                              th:text="${request.requestedAddress != null
+                                && !#strings.isEmpty(request.requestedAddress)
+                                ? request.requestedAddress : '-'}">-</span>
+                    </td>
+
+                    <!-- REASON -->
+                    <td>
+                        <div class="reason"
+                             th:text="${request.reason != null
+                                ? request.reason : '-'}">-</div>
+                    </td>
+
+                    <!-- REQUEST DATE -->
+                    <td th:text="${request.requestedAt != null
+                        ? #temporals.format(request.requestedAt, 'yyyy-MM-dd HH:mm')
+                        : '-'}">-</td>
+
+                    <!-- STATUS -->
+                    <td>
+                        <span class="status"
+                              th:classappend="${request.status != null
+                                && request.status.equalsIgnoreCase('PENDING')
+                                ? ' status-pending'
+                                : (request.status != null
+                                    && request.status.equalsIgnoreCase('APPROVED')
+                                    ? ' status-approved'
+                                    : ' status-rejected')}"
+                              th:text="${request.status != null
+                                ? request.status : 'UNKNOWN'}">
+                            PENDING
+                        </span>
+
+                        <div class="reviewed-remarks"
+                             th:if="${request.adminRemarks != null
+                                && !#strings.isEmpty(request.adminRemarks)}">
+                            Admin remarks:
+                            <span th:text="${request.adminRemarks}"></span>
+                        </div>
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td>
+
+                        <div class="action-box"
+                             th:if="${request.status != null
+                                && request.status.equalsIgnoreCase('PENDING')}">
+
+                            <form class="action-form"
+                                  method="post"
+                                  th:action="@{/admin/profile-change-requests/{id}/approve(id=${request.requestId})}"
+                                  onsubmit="return confirm('Approve this employee profile change request?');">
+
+                                <input type="text"
+                                       name="remarks"
+                                       maxlength="500"
+                                       placeholder="Admin remarks (optional)">
+
+                                <button type="submit" class="btn btn-approve">
+                                    ✓ Approve Request
+                                </button>
+                            </form>
+
+                            <form class="action-form"
+                                  method="post"
+                                  th:action="@{/admin/profile-change-requests/{id}/reject(id=${request.requestId})}"
+                                  onsubmit="return confirm('Reject this employee profile change request?');">
+
+                                <input type="text"
+                                       name="remarks"
+                                       maxlength="500"
+                                       placeholder="Rejection reason (optional)">
+
+                                <button type="submit" class="btn btn-reject">
+                                    ✕ Reject Request
+                                </button>
+                            </form>
+
+                        </div>
+
+                        <div th:unless="${request.status != null
+                            && request.status.equalsIgnoreCase('PENDING')}">
+                            <span style="color:#9ca3af;font-size:10px;">
+                                Already reviewed
+                            </span>
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        © Smart Attendance &amp; Payroll System<br>
+        Administration Management Portal
+    </footer>
+
+</main>
+
+</body>
+</html>

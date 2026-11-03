@@ -1,0 +1,675 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Holiday | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #5b5ce2;
+            --primary-dark: #4849c8;
+            --background: #f5f6fb;
+            --surface: #ffffff;
+            --text: #20243a;
+            --muted: #737b91;
+            --border: #e5e8f0;
+            --danger: #dc3545;
+            --shadow: 0 8px 30px rgba(31, 41, 85, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+
+        .topbar {
+            min-height: 72px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eeeeff;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .nav-links a {
+            padding: 9px 12px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .nav-links a:hover {
+            background: #f1f1ff;
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            background: #eeeeff;
+            color: var(--primary);
+        }
+
+        /* Main Container */
+
+        .page-container {
+            max-width: 950px;
+            margin: 38px auto;
+            padding: 0 22px 40px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 9px;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* Form Card */
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 23px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: #eeeeff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 750;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .form-body {
+            padding: 28px;
+        }
+
+        /* Information Box */
+
+        .info-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            background: #f0f4ff;
+            border: 1px solid #dbe4ff;
+            border-radius: 11px;
+            padding: 16px;
+            margin-bottom: 28px;
+        }
+
+        .info-icon {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: #dfe7ff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .info-content strong {
+            display: block;
+            font-size: 12px;
+            color: #34449a;
+            margin-bottom: 5px;
+        }
+
+        .info-content p {
+            font-size: 12px;
+            color: #52618d;
+            line-height: 1.7;
+        }
+
+        /* Form */
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 750;
+            color: #343b56;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 20px;
+        }
+
+        .section-title span {
+            width: 27px;
+            height: 27px;
+            border-radius: 8px;
+            background: #eeeeff;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 21px 22px;
+        }
+
+        .form-group {
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #424961;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 13px;
+            background: #fff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input,
+        select {
+            height: 46px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #a4aabd;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 92, 226, .10);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .help-text {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* Error Message */
+
+        .error-message {
+            background: #fff0f0;
+            border: 1px solid #ffd4d4;
+            color: #b42332;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 23px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        /* Form Actions */
+
+        .form-actions {
+            margin-top: 30px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-note {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .btn {
+            min-height: 43px;
+            padding: 0 19px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all .2s;
+        }
+
+        .cancel-btn {
+            background: #f1f2f7;
+            color: #50566d;
+            border: 1px solid var(--border);
+        }
+
+        .cancel-btn:hover {
+            background: #e8eaf2;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(91, 92, 226, .20);
+        }
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .page-footer {
+            text-align: center;
+            color: #9299aa;
+            font-size: 11px;
+            padding-top: 25px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 900px) {
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 13px;
+                padding: 15px 22px;
+            }
+
+            .nav-links {
+                width: 100%;
+            }
+
+            .nav-links a {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .page-container {
+                margin: 25px auto;
+                padding: 0 14px 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card-header {
+                padding: 19px;
+            }
+
+            .form-body {
+                padding: 20px 17px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .footer-note {
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="topbar">
+
+        <a href="/" class="brand">
+            <div class="brand-icon">✦</div>
+            <span>Smart Attendance & Payroll</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/employees">Employees</a>
+            <a href="/attendance">Attendance</a>
+            <a href="/qr-attendance">QR Attendance</a>
+            <a href="/payroll">Payroll</a>
+            <a href="/payroll/report">Reports</a>
+            <a href="/payroll-rules">Payroll Rules</a>
+            <a href="/holidays" class="active">Holidays</a>
+        </nav>
+
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-container">
+
+        <div class="breadcrumb">
+            <a href="/">Dashboard</a>
+            <span>/</span>
+            <a href="/holidays">Holiday Management</a>
+            <span>/</span>
+            <span>Add Holiday</span>
+        </div>
+
+        <div class="page-heading">
+            <h1>Add New Holiday</h1>
+            <p>Add and manage Poya, Public, Mercantile or Company holidays.</p>
+        </div>
+
+        <div class="form-card">
+
+            <div class="card-header">
+                <div class="header-icon">▦</div>
+                <div>
+                    <h2>Holiday Information</h2>
+                    <p>Enter the details of the holiday below.</p>
+                </div>
+            </div>
+
+            <div class="form-body">
+
+                <!-- Error Message -->
+                <div class="error-message"
+                     th:if="${errorMessage != null}"
+                     th:text="${errorMessage}">
+                    Error message
+                </div>
+
+                <!-- Information -->
+                <div class="info-box">
+                    <div class="info-icon">i</div>
+                    <div class="info-content">
+                        <strong>Important Payroll Information</strong>
+                        <p>
+                            Holidays added here will be excluded from
+                            payroll working-day calculations.
+                            Please ensure the holiday date and type are correct.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Holiday Form -->
+                <form th:action="@{/holidays/save}"
+                      th:object="${holiday}"
+                      method="post">
+
+                    <div class="section-title">
+                        <span>01</span>
+                        Holiday Details
+                    </div>
+
+                    <div class="form-grid">
+
+                        <!-- Holiday Date -->
+                        <div class="form-group">
+                            <label for="holidayDate">
+                                Holiday Date
+                                <span class="required">*</span>
+                            </label>
+
+                            <input type="date"
+                                   id="holidayDate"
+                                   th:field="*{holidayDate}"
+                                   required>
+
+                            <div class="help-text">
+                                Select the date of the holiday.
+                            </div>
+                        </div>
+
+                        <!-- Holiday Type -->
+                        <div class="form-group">
+                            <label for="holidayType">
+                                Holiday Type
+                                <span class="required">*</span>
+                            </label>
+
+                            <select id="holidayType"
+                                    th:field="*{holidayType}"
+                                    required>
+
+                                <option value="">-- Select Holiday Type --</option>
+                                <option value="POYA">Poya Day</option>
+                                <option value="PUBLIC">Public Holiday</option>
+                                <option value="MERCANTILE">Mercantile Holiday</option>
+                                <option value="COMPANY">Company Holiday</option>
+                                <option value="OTHER">Other</option>
+
+                            </select>
+                        </div>
+
+                        <!-- Holiday Name -->
+                        <div class="form-group full-width">
+                            <label for="holidayName">
+                                Holiday Name
+                                <span class="required">*</span>
+                            </label>
+
+                            <input type="text"
+                                   id="holidayName"
+                                   th:field="*{holidayName}"
+                                   placeholder="e.g. Vesak Full Moon Poya Day"
+                                   maxlength="150"
+                                   required>
+
+                            <div class="help-text">
+                                Enter the official name of the holiday.
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group full-width">
+                            <label for="description">
+                                Description
+                            </label>
+
+                            <textarea id="description"
+                                      th:field="*{description}"
+                                      placeholder="Enter optional additional information..."
+                                      maxlength="500"></textarea>
+
+                            <div class="help-text">
+                                Optional additional information about the holiday.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-actions">
+
+                        <div class="footer-note">
+                            Fields marked with <span class="required">*</span> are required.<br>
+                            Review the details before saving.
+                        </div>
+
+                        <div class="action-buttons">
+
+                            <a href="/holidays"
+                               class="btn cancel-btn">
+                                ← Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn save-btn">
+                                ✓ Save Holiday
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            © 2026 Smart Attendance & Payroll System. All rights reserved.
+        </footer>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,1020 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings | Smart Attendance &amp; Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --bg: #f5f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+            --danger: #b91c1c;
+            --danger-bg: #fee2e2;
+            --warning: #a16207;
+            --warning-bg: #fef9c3;
+            --shadow: 0 10px 30px rgba(15,23,42,.05);
+        }
+
+        body.dark {
+            --bg: #111827;
+            --surface: #1f2937;
+            --text: #f1f5f9;
+            --muted: #a5b4c7;
+            --border: #374151;
+            --success-bg: #123b2a;
+            --danger-bg: #451d25;
+            --warning-bg: #453719;
+            --shadow: 0 10px 30px rgba(0,0,0,.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background .2s, color .2s;
+        }
+
+        header {
+            min-height: 76px;
+            padding: 13px 5%;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            color: white;
+            background: linear-gradient(135deg,#4f46e5,#7c3aed);
+            font-size: 20px;
+        }
+
+        .brand small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        main {
+            width: min(1120px, 92%);
+            margin: 35px auto;
+        }
+
+        .intro { margin-bottom: 25px; }
+
+        .eyebrow {
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+        }
+
+        h1 {
+            margin: 10px 0 7px;
+            font-size: 28px;
+            letter-spacing: -.8px;
+        }
+
+        .intro p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .profile-banner {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+            padding: 21px 24px;
+            margin-bottom: 23px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .avatar {
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 17px;
+            color: white;
+            background: linear-gradient(135deg,#4f46e5,#8b5cf6);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .profile-banner h2 {
+            margin: 0 0 5px;
+            font-size: 17px;
+        }
+
+        .profile-banner p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .status {
+            margin-left: auto;
+            padding: 7px 12px;
+            border-radius: 30px;
+            background: var(--success-bg);
+            color: var(--success);
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 235px minmax(0,1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .sidebar, .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar {
+            padding: 12px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: 13px 12px;
+            margin: 3px 0;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--muted);
+            text-align: left;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(79,70,229,.10);
+            color: var(--primary);
+        }
+
+        .content { min-width: 0; }
+
+        .card {
+            padding: 25px;
+            margin-bottom: 20px;
+            scroll-margin-top: 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 21px;
+        }
+
+        .section-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: rgba(79,70,229,.10);
+            font-size: 20px;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 5px;
+            font-size: 15px;
+        }
+
+        .section-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .alert {
+            padding: 13px 15px;
+            margin-bottom: 18px;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .success {
+            color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .error {
+            color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 16px;
+        }
+
+        .field { margin-bottom: 16px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            min-height: 43px;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            outline: none;
+            background: var(--surface);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,70,229,.10);
+        }
+
+        input[readonly] {
+            background: var(--bg);
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        .hint {
+            display: block;
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            min-height: 43px;
+            padding: 0 18px;
+            border: 0;
+            border-radius: 9px;
+            background: var(--primary);
+            color: white;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: var(--primary-dark); }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { background: var(--border); }
+
+        .input-wrap { position: relative; }
+
+        .input-wrap input { padding-right: 68px; }
+
+        .toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .readonly-note {
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 9px;
+            background: var(--bg);
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .preference {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preference:last-of-type { border-bottom: 0; }
+
+        .preference strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .preference span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .switch {
+            width: 19px;
+            height: 19px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .theme-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 14px 17px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .theme-option input {
+            width: 16px;
+            min-height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .data-list {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 12px;
+        }
+
+        .data-item {
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .data-item span {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .data-item strong {
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 470px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 10px;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: var(--warning-bg);
+            color: var(--warning);
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .security-note {
+            margin-top: 17px;
+            padding: 13px;
+            border-radius: 9px;
+            background: var(--bg);
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .hidden-section { display: none; }
+
+        footer {
+            padding: 25px 10px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        @media(max-width:760px) {
+            main { margin: 25px auto; }
+            .layout { grid-template-columns: 1fr; }
+            .sidebar {
+                position: static;
+                display: flex;
+                gap: 5px;
+                overflow-x: auto;
+                padding: 8px;
+            }
+            .nav-item {
+                width: auto;
+                flex: 0 0 auto;
+                white-space: nowrap;
+                padding: 11px;
+            }
+        }
+
+        @media(max-width:520px) {
+            header { padding: 12px 4%; }
+            .brand { font-size: 11px; }
+            .brand-icon { width: 37px; height: 37px; }
+            .back-link { font-size: 10px; }
+            h1 { font-size: 23px; }
+            .profile-banner { padding: 16px; }
+            .avatar { width: 47px; height: 47px; }
+            .profile-banner h2 { font-size: 13px; }
+            .status { font-size: 9px; padding: 6px 8px; }
+            .card { padding: 18px; }
+            .grid, .data-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body th:classappend="${preferences.theme == 'DARK'} ? 'dark' : ''">
+
+<header>
+    <div class="brand">
+        <div class="brand-icon">✓</div>
+        <div>
+            Smart Attendance &amp; Payroll
+            <small>Employee Self-Service Portal</small>
+        </div>
+    </div>
+
+    <a class="back-link" th:href="@{/employee/dashboard}">
+        ← Back to Dashboard
+    </a>
+</header>
+
+<main>
+
+    <section class="intro">
+        <span class="eyebrow">EMPLOYEE SELF-SERVICE</span>
+        <h1>Account Settings ⚙️</h1>
+        <p>Manage your personal information, security and account preferences.</p>
+    </section>
+
+    <section class="profile-banner">
+        <div class="avatar"
+             th:text="${#strings.substring(employee.fullName,0,1).toUpperCase()}">E</div>
+
+        <div>
+            <h2 th:text="${employee.fullName}">Employee Name</h2>
+            <p>
+                <span th:text="${employee.employeeCode}">EMP001</span>
+                ·
+                <span th:text="${employee.department}">Department</span>
+            </p>
+        </div>
+
+        <span class="status"
+              th:text="${employee.status}">ACTIVE</span>
+    </section>
+
+    <div th:if="${successMessage}" class="alert success"
+         th:text="${successMessage}"></div>
+
+    <div th:if="${errorMessage}" class="alert error"
+         th:text="${errorMessage}"></div>
+
+    <div class="layout">
+
+        <nav class="sidebar">
+            <button class="nav-item active" onclick="showSection('personal',this)">
+                👤 Personal Information
+            </button>
+            <button class="nav-item" onclick="showSection('security',this)">
+                🔒 Password &amp; Security
+            </button>
+            <button class="nav-item" onclick="showSection('notifications',this)">
+                🔔 Notifications
+            </button>
+            <button class="nav-item" onclick="showSection('appearance',this)">
+                🎨 Appearance
+            </button>
+            <button class="nav-item" onclick="showSection('account',this)">
+                ℹ️ Account Information
+            </button>
+        </nav>
+
+        <div class="content">
+
+            <!-- PERSONAL INFORMATION -->
+            <section id="personal" class="card settings-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">👤</div>
+                    <div>
+                        <h2>Personal Information</h2>
+                        <p>View your registered employee details.</p>
+                    </div>
+                </div>
+
+                <div class="readonly-note">
+                    Your official employee information is managed by the
+                    administrator. You can request changes to your phone
+                    number or address below.
+                </div>
+
+                <div class="grid">
+                    <div class="field">
+                        <label>FULL NAME</label>
+                        <input type="text" th:value="${employee.fullName}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>EMPLOYEE CODE</label>
+                        <input type="text" th:value="${employee.employeeCode}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>EMAIL ADDRESS</label>
+                        <input type="email" th:value="${employee.email}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>NIC NUMBER</label>
+                        <input type="text" th:value="${employee.nic}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>DEPARTMENT</label>
+                        <input type="text" th:value="${employee.department}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>JOB POSITION</label>
+                        <input type="text" th:value="${employee.jobPosition}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>CURRENT PHONE</label>
+                        <input type="text" th:value="${employee.phone}" readonly>
+                    </div>
+
+                    <div class="field">
+                        <label>JOINING DATE</label>
+                        <input type="text" th:value="${employee.joiningDate}" readonly>
+                    </div>
+                </div>
+
+                <hr style="border:0;border-top:1px solid var(--border);margin:12px 0 22px;">
+
+                <h2 style="font-size:14px;margin-bottom:7px;">Request Profile Changes</h2>
+                <p class="hint" style="margin-bottom:18px;">
+                    Submit your new phone number or address for administrator approval.
+                </p>
+
+                <form th:action="@{/employee/profile-change-request}" method="post">
+
+                    <div class="grid">
+                        <div class="field">
+                            <label for="phone">REQUESTED PHONE NUMBER</label>
+                            <input type="text" id="phone" name="phone"
+                                   maxlength="20"
+                                   th:value="${employee.phone}"
+                                   placeholder="Enter phone number">
+                        </div>
+
+                        <div class="field">
+                            <label for="address">REQUESTED ADDRESS</label>
+                            <input type="text" id="address" name="address"
+                                   maxlength="255"
+                                   th:value="${employee.address}"
+                                   placeholder="Enter address">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="reason">REASON FOR CHANGE</label>
+                        <textarea id="reason" name="reason" maxlength="500"
+                                  required
+                                  placeholder="Explain why you need this change..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Submit Change Request →
+                    </button>
+                </form>
+
+                <div style="margin-top:28px;">
+                    <h2 style="font-size:14px;margin-bottom:15px;">
+                        My Profile Change Requests
+                    </h2>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>REQUESTED PHONE</th>
+                                    <th>REQUESTED ADDRESS</th>
+                                    <th>DATE</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr th:each="request : ${profileRequests}">
+                                    <td th:text="${request.requestedPhone != null ? request.requestedPhone : '-'}">-</td>
+                                    <td th:text="${request.requestedAddress != null ? request.requestedAddress : '-'}">-</td>
+                                    <td th:text="${request.requestedAt != null ? #temporals.format(request.requestedAt,'yyyy-MM-dd HH:mm') : 'Pending'}">-</td>
+                                    <td>
+                                        <span class="badge"
+                                              th:text="${request.status}">PENDING</span>
+                                    </td>
+                                </tr>
+
+                                <tr th:if="${#lists.isEmpty(profileRequests)}">
+                                    <td colspan="4" style="text-align:center;color:var(--muted);">
+                                        No profile change requests yet.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASSWORD AND SECURITY -->
+            <section id="security" class="card settings-section hidden-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">🔒</div>
+                    <div>
+                        <h2>Password &amp; Security</h2>
+                        <p>Keep your employee account secure.</p>
+                    </div>
+                </div>
+
+                <form th:action="@{/employee/change-password}"
+                      method="post"
+                      onsubmit="return validatePasswordForm()">
+
+                    <div class="field">
+                        <label for="currentPassword">CURRENT PASSWORD</label>
+                        <div class="input-wrap">
+                            <input type="password" id="currentPassword"
+                                   name="currentPassword" required
+                                   autocomplete="current-password">
+                            <button type="button" class="toggle"
+                                    onclick="togglePassword('currentPassword',this)">
+                                SHOW
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="newPassword">NEW PASSWORD</label>
+                        <div class="input-wrap">
+                            <input type="password" id="newPassword"
+                                   name="newPassword" minlength="8"
+                                   maxlength="72" required
+                                   autocomplete="new-password">
+                            <button type="button" class="toggle"
+                                    onclick="togglePassword('newPassword',this)">
+                                SHOW
+                            </button>
+                        </div>
+                        <span class="hint">Use at least 8 characters.</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="confirmPassword">CONFIRM NEW PASSWORD</label>
+                        <div class="input-wrap">
+                            <input type="password" id="confirmPassword"
+                                   name="confirmPassword" minlength="8"
+                                   maxlength="72" required
+                                   autocomplete="new-password">
+                            <button type="button" class="toggle"
+                                    onclick="togglePassword('confirmPassword',this)">
+                                SHOW
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Update Password →
+                    </button>
+                </form>
+
+                <div class="security-note">
+                    🛡️ Your password is encrypted using BCrypt before being
+                    saved. Never share your password with anyone.
+                </div>
+            </section>
+
+            <!-- NOTIFICATIONS -->
+            <section id="notifications" class="card settings-section hidden-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">🔔</div>
+                    <div>
+                        <h2>Notification Preferences</h2>
+                        <p>Choose which notification preferences you want enabled.</p>
+                    </div>
+                </div>
+
+                <form th:action="@{/employee/save-notifications}" method="post">
+
+                    <div class="preference">
+                        <div>
+                            <strong>Attendance Notifications</strong>
+                            <span>Enable attendance-related notification preferences.</span>
+                        </div>
+                        <input class="switch" type="checkbox"
+                               name="attendanceNotifications"
+                               value="true"
+                               th:checked="${preferences.attendanceNotifications}">
+                    </div>
+
+                    <div class="preference">
+                        <div>
+                            <strong>Payroll Notifications</strong>
+                            <span>Enable payroll-related notification preferences.</span>
+                        </div>
+                        <input class="switch" type="checkbox"
+                               name="payrollNotifications"
+                               value="true"
+                               th:checked="${preferences.payrollNotifications}">
+                    </div>
+
+                    <div class="preference">
+                        <div>
+                            <strong>Payslip Notifications</strong>
+                            <span>Enable payslip notification preferences.</span>
+                        </div>
+                        <input class="switch" type="checkbox"
+                               name="payslipNotifications"
+                               value="true"
+                               th:checked="${preferences.payslipNotifications}">
+                    </div>
+
+                    <p class="hint" style="margin:16px 0;">
+                        These settings save your preferences. Actual email
+                        notification delivery must be connected to the
+                        notification sending services separately.
+                    </p>
+
+                    <button type="submit" class="btn">
+                        Save Notification Preferences →
+                    </button>
+                </form>
+            </section>
+
+            <!-- APPEARANCE -->
+            <section id="appearance" class="card settings-section hidden-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">🎨</div>
+                    <div>
+                        <h2>Appearance</h2>
+                        <p>Choose your preferred account settings theme.</p>
+                    </div>
+                </div>
+
+                <form th:action="@{/employee/save-appearance}" method="post">
+
+                    <label>SELECT THEME</label>
+
+                    <div class="theme-options">
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="LIGHT"
+                                   th:checked="${preferences.theme == 'LIGHT'}">
+                            ☀️ Light Mode
+                        </label>
+
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="DARK"
+                                   th:checked="${preferences.theme == 'DARK'}">
+                            🌙 Dark Mode
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Save Appearance →
+                    </button>
+                </form>
+
+                <div class="security-note">
+                    Your selected theme will be saved to your account preferences.
+                    This version applies the theme to the Account Settings page.
+                </div>
+            </section>
+
+            <!-- ACCOUNT INFORMATION -->
+            <section id="account" class="card settings-section hidden-section">
+
+                <div class="section-heading">
+                    <div class="section-icon">ℹ️</div>
+                    <div>
+                        <h2>Account Information</h2>
+                        <p>View your registered employee account details.</p>
+                    </div>
+                </div>
+
+                <div class="data-list">
+                    <div class="data-item">
+                        <span>EMPLOYEE ID</span>
+                        <strong th:text="${employee.employeeId}">1</strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>EMPLOYEE CODE</span>
+                        <strong th:text="${employee.employeeCode}">EMP001</strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>LOGIN USERNAME</span>
+                        <strong th:text="${employee.email}">employee@email.com</strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>ACCOUNT ROLE</span>
+                        <strong>EMPLOYEE</strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>EMPLOYMENT STATUS</span>
+                        <strong th:text="${employee.status}">ACTIVE</strong>
+                    </div>
+
+                    <div class="data-item">
+                        <span>JOINING DATE</span>
+                        <strong th:text="${employee.joiningDate}">2026-01-01</strong>
+                    </div>
+                </div>
+
+                <div class="security-note">
+                    Account access and official employee information are
+                    controlled by the system administrator.
+                </div>
+
+                <a th:href="@{/logout}" class="btn"
+                   style="display:inline-flex;align-items:center;text-decoration:none;margin-top:18px;">
+                    Sign Out
+                </a>
+            </section>
+
+        </div>
+    </div>
+</main>
+
+<footer>
+    Smart Attendance &amp; Payroll System © 2026<br>
+    Employee Self-Service Portal
+</footer>
+
+<script>
+    function showSection(sectionId, button) {
+        document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.add('hidden-section');
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        document.getElementById(sectionId).classList.remove('hidden-section');
+        button.classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            button.textContent = 'HIDE';
+        } else {
+            input.type = 'password';
+            button.textContent = 'SHOW';
+        }
+    }
+
+    function validatePasswordForm() {
+        const current = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (newPassword.length < 8 || newPassword.length > 72) {
+            alert('Password must contain between 8 and 72 characters.');
+            return false;
+        }
+
+        if (newPassword !== confirm) {
+            alert('New password and confirmation do not match.');
+            return false;
+        }
+
+        if (current === newPassword) {
+            alert('New password must be different from your current password.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+</body>
+</html>

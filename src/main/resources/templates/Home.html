@@ -1,0 +1,1851 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Attendance &amp; Payroll | Workforce Management</title>
+
+    <meta name="description"
+          content="Manage employee attendance, QR check-ins, payroll processing and monthly reports from one smart platform.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #5145e5;
+            --primary-dark: #3730a3;
+            --ink: #172033;
+            --muted: #68738a;
+            --line: #e8eaf2;
+            --soft: #f7f8ff;
+            --white: #ffffff;
+            --green: #12a875;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 90px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+            background: var(--white);
+            line-height: 1.6;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .container {
+            width: min(1160px, calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        /* NAVIGATION */
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(232, 234, 242, .9);
+        }
+
+        .nav-inner {
+            min-height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #7167f6, #4338ca);
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 7px 17px rgba(81, 69, 229, .24);
+        }
+
+        .brand-name {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -.45px;
+            line-height: 1.35;
+        }
+
+        .brand-caption {
+            margin-top: 3px;
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .nav-links > a:not(.button) {
+            color: #606b80;
+            font-size: 12px;
+            font-weight: 600;
+            transition: color .2s;
+        }
+
+        .nav-links > a:not(.button):hover {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .button {
+            min-height: 44px;
+            padding: 0 19px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s, background .2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button-primary {
+            color: white;
+            background: linear-gradient(115deg, #6155ed, #4338ca);
+            box-shadow: 0 7px 18px rgba(81, 69, 229, .20);
+        }
+
+        .button-primary:hover {
+            box-shadow: 0 10px 24px rgba(81, 69, 229, .30);
+        }
+
+        .button-outline {
+            color: var(--ink);
+            background: white;
+            border-color: #e0e3ed;
+        }
+
+        .button-outline:hover {
+            border-color: #b8b3ff;
+            background: #fafaff;
+        }
+
+        .mobile-menu-button {
+            display: none;
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: white;
+            font-size: 21px;
+            cursor: pointer;
+        }
+
+        /* HERO */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 78px 0 83px;
+            background:
+                radial-gradient(ellipse at 85% 15%, rgba(117, 105, 255, .13), transparent 32%),
+                radial-gradient(ellipse at 8% 80%, rgba(100, 181, 246, .10), transparent 30%),
+                linear-gradient(180deg, #fcfcff, #ffffff);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.02fr;
+            align-items: center;
+            gap: 62px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 13px;
+            border: 1px solid #e2dfff;
+            border-radius: 30px;
+            background: #f3f1ff;
+            color: #4d42ca;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .75px;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #7367f0;
+            box-shadow: 0 0 0 4px rgba(115, 103, 240, .12);
+        }
+
+        .hero h1 {
+            max-width: 590px;
+            margin-top: 24px;
+            font-size: clamp(39px, 4.3vw, 58px);
+            line-height: 1.12;
+            letter-spacing: -2.6px;
+            font-weight: 800;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero-description {
+            max-width: 480px;
+            margin-top: 22px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.95;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 13px;
+            margin-top: 30px;
+        }
+
+        .hero-actions .button {
+            min-height: 49px;
+            padding: 0 22px;
+        }
+
+        .trust-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 19px;
+            margin-top: 29px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #596579;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .trust-check {
+            width: 19px;
+            height: 19px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #e9faf3;
+            color: #07865d;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* DASHBOARD PREVIEW */
+
+        .preview-area {
+            position: relative;
+            padding: 12px 0 22px 14px;
+        }
+
+        .preview-glow {
+            position: absolute;
+            inset: 12% 2% 5% 12%;
+            background: linear-gradient(135deg, #b9b4ff, #dceeff);
+            filter: blur(60px);
+            opacity: .65;
+            border-radius: 50%;
+        }
+
+        .dashboard-preview {
+            position: relative;
+            z-index: 1;
+            padding: 24px;
+            border: 1px solid #e8eaf5;
+            border-radius: 21px;
+            background: rgba(255, 255, 255, .97);
+            box-shadow: 0 30px 80px rgba(42, 45, 90, .13);
+            transform: rotateY(-2deg) rotateX(1deg);
+            animation: enter .7s ease both;
+        }
+
+        @keyframes enter {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .preview-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eff0f6;
+        }
+
+        .preview-title {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -.4px;
+        }
+
+        .preview-subtitle {
+            margin-top: 4px;
+            color: #8992a5;
+            font-size: 10px;
+        }
+
+        .period-pill {
+            padding: 7px 10px;
+            color: #5c53cf;
+            background: #f1efff;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 17px;
+        }
+
+        .metric-card {
+            padding: 15px;
+            border: 1px solid #eceef5;
+            border-radius: 13px;
+            background: #fff;
+        }
+
+        .metric-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #7c879b;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .metric-icon {
+            width: 27px;
+            height: 27px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .metric-icon.purple {
+            background: #efedff;
+            color: #6155ed;
+        }
+
+        .metric-icon.green {
+            background: #e7f9f1;
+            color: #079669;
+        }
+
+        .metric-icon.blue {
+            background: #e8f4ff;
+            color: #2580ce;
+        }
+
+        .metric-icon.orange {
+            background: #fff2df;
+            color: #cf8219;
+        }
+
+        .metric-value {
+            margin-top: 12px;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .metric-note {
+            margin-top: 3px;
+            color: #8992a5;
+            font-size: 9px;
+        }
+
+        .preview-bottom {
+            display: grid;
+            grid-template-columns: 1.08fr .92fr;
+            gap: 13px;
+            margin-top: 15px;
+        }
+
+        .chart-card,
+        .attendance-card {
+            min-width: 0;
+            padding: 15px;
+            border: 1px solid #eceef5;
+            border-radius: 13px;
+        }
+
+        .mini-heading {
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .mini-caption {
+            margin-top: 3px;
+            color: #929aab;
+            font-size: 9px;
+        }
+
+        .chart-bars {
+            height: 96px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 7px;
+            margin-top: 14px;
+            padding: 0 3px;
+            border-bottom: 1px solid #e9ebf3;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0,
+                transparent 29px,
+                #f0f1f7 30px
+            );
+        }
+
+        .bar-pair {
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+        }
+
+        .bar {
+            width: 8px;
+            border-radius: 4px 4px 0 0;
+            background: #7367f0;
+        }
+
+        .bar.alt {
+            background: #c9c5ff;
+        }
+
+        .attendance-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 12px;
+        }
+
+        .avatar {
+            width: 25px;
+            height: 25px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            color: #4d42ca;
+            background: #efedff;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .avatar.aqua {
+            color: #087d76;
+            background: #e2f8f5;
+        }
+
+        .avatar.peach {
+            color: #a85524;
+            background: #fff0e5;
+        }
+
+        .attendance-person {
+            flex: 1;
+            min-width: 0;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .attendance-time {
+            margin-top: 2px;
+            color: #929aab;
+            font-size: 8px;
+            font-weight: 500;
+        }
+
+        .status {
+            padding: 4px 6px;
+            border-radius: 5px;
+            color: #07865d;
+            background: #e8f9f1;
+            font-size: 8px;
+            font-weight: 800;
+        }
+
+        .floating-note {
+            position: absolute;
+            z-index: 2;
+            right: -15px;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 13px 16px;
+            border: 1px solid #edf0f6;
+            border-radius: 13px;
+            background: white;
+            box-shadow: 0 14px 35px rgba(42, 45, 90, .13);
+        }
+
+        .floating-check {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #e7f9f1;
+            color: #079669;
+            font-size: 17px;
+        }
+
+        .floating-title {
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .floating-subtitle {
+            margin-top: 2px;
+            color: #8992a5;
+            font-size: 9px;
+        }
+
+        /* TRUST STRIP */
+
+        .trust-strip {
+            padding: 23px 0;
+            border-top: 1px solid #f0f1f6;
+            border-bottom: 1px solid #f0f1f6;
+            background: #fff;
+        }
+
+        .trust-strip-inner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 34px;
+        }
+
+        .trust-strip-label {
+            color: #939bad;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .trust-strip-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #536076;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .trust-strip-item span {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        /* FEATURES */
+
+        .features {
+            padding: 88px 0 94px;
+            background: #fff;
+        }
+
+        .section-heading {
+            max-width: 660px;
+            margin: 0 auto 42px;
+            text-align: center;
+        }
+
+        .section-label {
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .section-heading h2 {
+            margin-top: 13px;
+            font-size: clamp(29px, 3.2vw, 39px);
+            line-height: 1.25;
+            letter-spacing: -1.5px;
+            font-weight: 800;
+        }
+
+        .section-heading p {
+            margin-top: 13px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .feature-card {
+            padding: 26px 22px;
+            border: 1px solid #eaecf4;
+            border-radius: 17px;
+            background: white;
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #d3ceff;
+            box-shadow: 0 16px 35px rgba(48, 44, 120, .07);
+        }
+
+        .feature-card-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: #f0eeff;
+            color: var(--primary);
+            font-size: 22px;
+        }
+
+        .feature-card:nth-child(2) .feature-card-icon {
+            color: #087f8c;
+            background: #e4f8fa;
+        }
+
+        .feature-card:nth-child(3) .feature-card-icon {
+            color: #b66b10;
+            background: #fff3df;
+        }
+
+        .feature-card:nth-child(4) .feature-card-icon {
+            color: #07865d;
+            background: #e7f9f1;
+        }
+
+        .feature-card h3 {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: -.3px;
+        }
+
+        .feature-card p {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.9;
+        }
+
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 17px;
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* HOW IT WORKS */
+
+        .how-it-works {
+            padding: 80px 0;
+            background: var(--soft);
+            border-top: 1px solid #eef0fa;
+            border-bottom: 1px solid #eef0fa;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 26px;
+            margin-top: 42px;
+        }
+
+        .step-card {
+            position: relative;
+            padding: 28px;
+            border: 1px solid #e9eaf4;
+            border-radius: 17px;
+            background: white;
+        }
+
+        .step-number {
+            width: 37px;
+            height: 37px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: #efedff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .step-card h3 {
+            margin-top: 17px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .step-card p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.9;
+        }
+
+        /* CALL TO ACTION */
+
+        .cta-section {
+            padding: 80px 0;
+        }
+
+        .cta-card {
+            position: relative;
+            overflow: hidden;
+            padding: 50px 45px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            border-radius: 23px;
+            color: white;
+            background: linear-gradient(115deg, #3730a3, #5145e5 62%, #7067f6);
+            box-shadow: 0 20px 45px rgba(81, 69, 229, .18);
+        }
+
+        .cta-card::after {
+            content: "";
+            position: absolute;
+            width: 270px;
+            height: 270px;
+            right: 20%;
+            top: -200px;
+            border: 1px solid rgba(255,255,255,.17);
+            border-radius: 50%;
+            box-shadow: 0 0 0 35px rgba(255,255,255,.04),
+                        0 0 0 70px rgba(255,255,255,.03);
+        }
+
+        .cta-content,
+        .cta-actions {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-card h2 {
+            font-size: clamp(25px, 3vw, 34px);
+            letter-spacing: -1.2px;
+            line-height: 1.25;
+        }
+
+        .cta-card p {
+            max-width: 520px;
+            margin-top: 12px;
+            color: #e0e7ff;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        .cta-actions .button {
+            min-height: 48px;
+            white-space: nowrap;
+            color: #3730a3;
+            background: white;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            padding: 27px 0;
+            border-top: 1px solid #eceef4;
+            background: #fff;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .footer-copy {
+            color: #8992a5;
+            font-size: 10px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #667085;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1050px) {
+            .hero-grid {
+                gap: 34px;
+            }
+
+            .hero h1 {
+                font-size: 46px;
+            }
+
+            .dashboard-preview {
+                padding: 18px;
+            }
+
+            .metric-value {
+                font-size: 22px;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .floating-note {
+                right: -6px;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .container {
+                width: min(100% - 36px, 600px);
+            }
+
+            .nav-inner {
+                min-height: 70px;
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 12px 0;
+            }
+
+            .mobile-menu-button {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                order: 3;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+                padding: 8px 0;
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .nav-links > a:not(.button) {
+                padding: 12px 8px;
+            }
+
+            .nav-links .mobile-signin {
+                display: flex;
+                margin-top: 8px;
+            }
+
+            .nav-actions {
+                margin-left: auto;
+            }
+
+            .nav-actions .button-outline {
+                display: none;
+            }
+
+            .nav-actions .button {
+                min-height: 40px;
+                padding: 0 13px;
+                font-size: 11px;
+            }
+
+            .hero {
+                padding: 52px 0 65px;
+            }
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 38px;
+            }
+
+            .hero-copy {
+                text-align: center;
+            }
+
+            .hero h1,
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero h1 {
+                font-size: clamp(38px, 8vw, 52px);
+                letter-spacing: -1.8px;
+            }
+
+            .hero-description {
+                font-size: 13px;
+            }
+
+            .hero-actions,
+            .trust-line {
+                justify-content: center;
+            }
+
+            .preview-area {
+                max-width: 540px;
+                width: 100%;
+                margin: 0 auto;
+                padding-left: 0;
+            }
+
+            .floating-note {
+                right: -5px;
+            }
+
+            .trust-strip-inner {
+                gap: 17px 24px;
+            }
+
+            .trust-strip-label {
+                width: 100%;
+                text-align: center;
+            }
+
+            .features,
+            .how-it-works {
+                padding: 65px 0;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .cta-card {
+                padding: 35px 28px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cta-section {
+                padding: 60px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: calc(100% - 28px);
+            }
+
+            .brand-logo {
+                width: 39px;
+                height: 39px;
+                border-radius: 12px;
+            }
+
+            .brand-name {
+                font-size: 12px;
+            }
+
+            .brand-caption {
+                font-size: 9px;
+            }
+
+            .nav-actions .button-primary {
+                min-height: 38px;
+                padding: 0 10px;
+                font-size: 10px;
+            }
+
+            .hero {
+                padding-top: 42px;
+            }
+
+            .hero h1 {
+                font-size: 37px;
+            }
+
+            .hero-description {
+                font-size: 12px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .hero-actions .button {
+                width: 100%;
+            }
+
+            .trust-line {
+                gap: 11px 15px;
+            }
+
+            .trust-item {
+                font-size: 9px;
+            }
+
+            .dashboard-preview {
+                padding: 13px;
+                border-radius: 16px;
+            }
+
+            .preview-top {
+                align-items: flex-start;
+            }
+
+            .preview-title {
+                font-size: 12px;
+            }
+
+            .metric-grid {
+                gap: 8px;
+            }
+
+            .metric-card {
+                padding: 11px;
+            }
+
+            .metric-label {
+                font-size: 9px;
+            }
+
+            .metric-value {
+                font-size: 21px;
+            }
+
+            .metric-note {
+                font-size: 8px;
+            }
+
+            .preview-bottom {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-bars {
+                height: 80px;
+            }
+
+            .attendance-card {
+                display: none;
+            }
+
+            .floating-note {
+                right: -2px;
+                bottom: -20px;
+                padding: 9px 11px;
+            }
+
+            .floating-check {
+                width: 29px;
+                height: 29px;
+            }
+
+            .trust-strip-item {
+                font-size: 9px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .feature-card {
+                padding: 22px;
+            }
+
+            .section-heading h2 {
+                font-size: 30px;
+            }
+
+            .cta-card {
+                padding: 30px 22px;
+            }
+
+            .cta-card h2 {
+                font-size: 27px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="container nav-inner">
+
+        <!-- BRAND: Always return to public Home Page -->
+        <a class="brand"
+           th:href="@{/home}"
+           aria-label="Smart Attendance home">
+
+            <div class="brand-logo">SA</div>
+
+            <div>
+                <div class="brand-name">Smart Attendance</div>
+                <div class="brand-caption">
+                    Attendance &amp; Payroll System
+                </div>
+            </div>
+        </a>
+
+        <nav class="nav-links"
+             id="mainNavigation"
+             aria-label="Main navigation">
+
+            <a th:href="@{/home}">Home</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+
+            <a class="button button-outline mobile-signin"
+               th:href="@{/login}">
+                Sign In
+            </a>
+
+        </nav>
+
+        <div class="nav-actions">
+
+            <a class="button button-outline"
+               th:href="@{/login}">
+                Sign In
+            </a>
+
+            <a class="button button-primary"
+               th:href="@{/login}">
+                Get Started <span aria-hidden="true">→</span>
+            </a>
+
+            <button class="mobile-menu-button"
+                    type="button"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-controls="mainNavigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+        </div>
+    </div>
+</header>
+
+<main>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+
+        <div class="container hero-grid">
+
+            <div class="hero-copy">
+
+                <div class="eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    SMART WORKFORCE MANAGEMENT
+                </div>
+
+                <h1>
+                    People management,<br>
+                    <span>made simple.</span>
+                </h1>
+
+                <p class="hero-description">
+                    One organized platform for employee attendance,
+                    QR check-ins, payroll processing and monthly reports.
+                    Spend less time managing tasks and more time moving forward.
+                </p>
+
+                <div class="hero-actions">
+
+                    <a class="button button-primary"
+                       th:href="@{/login}">
+                        Access Your Workspace
+                        <span aria-hidden="true">→</span>
+                    </a>
+
+                    <a class="button button-outline"
+                       href="#features">
+                        Explore Features
+                        <span aria-hidden="true">↓</span>
+                    </a>
+
+                </div>
+
+                <div class="trust-line">
+
+                    <div class="trust-item">
+                        <span class="trust-check">✓</span>
+                        Attendance Tracking
+                    </div>
+
+                    <div class="trust-item">
+                        <span class="trust-check">✓</span>
+                        Streamlined Payroll
+                    </div>
+
+                    <div class="trust-item">
+                        <span class="trust-check">✓</span>
+                        Role-Based Access
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DASHBOARD PREVIEW -->
+            <div class="preview-area"
+                 aria-label="Illustrative system dashboard preview">
+
+                <div class="preview-glow"></div>
+
+                <div class="dashboard-preview">
+
+                    <div class="preview-top">
+
+                        <div>
+                            <div class="preview-title">
+                                Workspace Overview
+                            </div>
+
+                            <div class="preview-subtitle">
+                                Smart workforce management
+                            </div>
+                        </div>
+
+                        <div class="period-pill">
+                            SYSTEM PREVIEW
+                        </div>
+
+                    </div>
+
+                    <div class="metric-grid">
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                <span class="metric-icon purple">♙</span>
+                                Total Employees
+                            </div>
+
+                            <div class="metric-value">Team</div>
+
+                            <div class="metric-note">
+                                Employee management
+                            </div>
+
+                        </div>
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                <span class="metric-icon green">✓</span>
+                                Attendance
+                            </div>
+
+                            <div class="metric-value">Daily</div>
+
+                            <div class="metric-note">
+                                Attendance monitoring
+                            </div>
+
+                        </div>
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                <span class="metric-icon blue">▦</span>
+                                QR Check-in
+                            </div>
+
+                            <div class="metric-value">Quick</div>
+
+                            <div class="metric-note">
+                                Convenient check-in flow
+                            </div>
+
+                        </div>
+
+                        <div class="metric-card">
+
+                            <div class="metric-label">
+                                <span class="metric-icon orange">Rs.</span>
+                                Payroll
+                            </div>
+
+                            <div class="metric-value">Monthly</div>
+
+                            <div class="metric-note">
+                                Payroll processing
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="preview-bottom">
+
+                        <div class="chart-card">
+
+                            <div class="mini-heading">
+                                Attendance Activity
+                            </div>
+
+                            <div class="mini-caption">
+                                Illustrative weekly overview
+                            </div>
+
+                            <div class="chart-bars" aria-hidden="true">
+
+                                <div class="bar-pair">
+                                    <div class="bar" style="height: 53%"></div>
+                                    <div class="bar alt" style="height: 28%"></div>
+                                </div>
+
+                                <div class="bar-pair">
+                                    <div class="bar" style="height: 76%"></div>
+                                    <div class="bar alt" style="height: 42%"></div>
+                                </div>
+
+                                <div class="bar-pair">
+                                    <div class="bar" style="height: 63%"></div>
+                                    <div class="bar alt" style="height: 35%"></div>
+                                </div>
+
+                                <div class="bar-pair">
+                                    <div class="bar" style="height: 89%"></div>
+                                    <div class="bar alt" style="height: 50%"></div>
+                                </div>
+
+                                <div class="bar-pair">
+                                    <div class="bar" style="height: 71%"></div>
+                                    <div class="bar alt" style="height: 38%"></div>
+                                </div>
+
+                                <div class="bar-pair">
+                                    <div class="bar" style="height: 94%"></div>
+                                    <div class="bar alt" style="height: 46%"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="attendance-card">
+
+                            <div class="mini-heading">
+                                System Capabilities
+                            </div>
+
+                            <div class="mini-caption">
+                                Available modules
+                            </div>
+
+                            <div class="attendance-row">
+
+                                <div class="avatar">AT</div>
+
+                                <div class="attendance-person">
+                                    Attendance
+                                    <div class="attendance-time">
+                                        Daily records
+                                    </div>
+                                </div>
+
+                                <span class="status">Track</span>
+
+                            </div>
+
+                            <div class="attendance-row">
+
+                                <div class="avatar aqua">QR</div>
+
+                                <div class="attendance-person">
+                                    QR Check-in
+                                    <div class="attendance-time">
+                                        Scan workflow
+                                    </div>
+                                </div>
+
+                                <span class="status">Scan</span>
+
+                            </div>
+
+                            <div class="attendance-row">
+
+                                <div class="avatar peach">PR</div>
+
+                                <div class="attendance-person">
+                                    Payroll
+                                    <div class="attendance-time">
+                                        Monthly records
+                                    </div>
+                                </div>
+
+                                <span class="status">Manage</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="floating-note">
+
+                    <div class="floating-check">✓</div>
+
+                    <div>
+                        <div class="floating-title">
+                            One connected workspace
+                        </div>
+
+                        <div class="floating-subtitle">
+                            Attendance, employees and payroll
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <section class="trust-strip"
+             aria-label="Platform capabilities">
+
+        <div class="container trust-strip-inner">
+
+            <div class="trust-strip-label">
+                Everything in one place
+            </div>
+
+            <div class="trust-strip-item">
+                <span>◷</span> Attendance Records
+            </div>
+
+            <div class="trust-strip-item">
+                <span>▦</span> QR Attendance
+            </div>
+
+            <div class="trust-strip-item">
+                <span>Rs.</span> Payroll Management
+            </div>
+
+            <div class="trust-strip-item">
+                <span>▤</span> Monthly Reports
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    Platform Features
+                </div>
+
+                <h2>Everything your team needs.</h2>
+
+                <p>
+                    Manage everyday workforce operations from one place,
+                    with dedicated tools for employee records, attendance
+                    and payroll administration.
+                </p>
+
+            </div>
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+
+                    <div class="feature-card-icon" aria-hidden="true">
+                        ◷
+                    </div>
+
+                    <h3>Attendance Tracking</h3>
+
+                    <p>
+                        Manage attendance records, check-in and check-out
+                        details, and daily attendance summaries.
+                    </p>
+
+                    <a class="feature-link" th:href="@{/login}">
+                        Access workspace
+                        <span aria-hidden="true">→</span>
+                    </a>
+
+                </article>
+
+                <article class="feature-card">
+
+                    <div class="feature-card-icon" aria-hidden="true">
+                        ▦
+                    </div>
+
+                    <h3>QR Attendance</h3>
+
+                    <p>
+                        Use the QR attendance workflow to support
+                        convenient employee check-in operations.
+                    </p>
+
+                    <a class="feature-link" th:href="@{/login}">
+                        Access workspace
+                        <span aria-hidden="true">→</span>
+                    </a>
+
+                </article>
+
+                <article class="feature-card">
+
+                    <div class="feature-card-icon" aria-hidden="true">
+                        Rs.
+                    </div>
+
+                    <h3>Payroll Management</h3>
+
+                    <p>
+                        Organize monthly payroll records, salary details,
+                        allowances, deductions and tax calculations.
+                    </p>
+
+                    <a class="feature-link" th:href="@{/login}">
+                        Access workspace
+                        <span aria-hidden="true">→</span>
+                    </a>
+
+                </article>
+
+                <article class="feature-card">
+
+                    <div class="feature-card-icon" aria-hidden="true">
+                        ▤
+                    </div>
+
+                    <h3>Reports &amp; Insights</h3>
+
+                    <p>
+                        Review attendance summaries and payroll reports
+                        to support informed management decisions.
+                    </p>
+
+                    <a class="feature-link" th:href="@{/login}">
+                        Access workspace
+                        <span aria-hidden="true">→</span>
+                    </a>
+
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-it-works" id="how-it-works">
+
+        <div class="container">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    Simple Workflow
+                </div>
+
+                <h2>From daily attendance to payroll.</h2>
+
+                <p>
+                    Keep essential workforce processes organized
+                    with a straightforward, connected workflow.
+                </p>
+
+            </div>
+
+            <div class="steps-grid">
+
+                <article class="step-card">
+
+                    <div class="step-number">01</div>
+
+                    <h3>Manage Employee Information</h3>
+
+                    <p>
+                        Maintain employee details and organize
+                        your workforce from the management workspace.
+                    </p>
+
+                </article>
+
+                <article class="step-card">
+
+                    <div class="step-number">02</div>
+
+                    <h3>Record Attendance</h3>
+
+                    <p>
+                        Review daily attendance records and use the
+                        available QR attendance workflow.
+                    </p>
+
+                </article>
+
+                <article class="step-card">
+
+                    <div class="step-number">03</div>
+
+                    <h3>Process Payroll</h3>
+
+                    <p>
+                        Manage payroll records and review monthly
+                        summaries and reports.
+                    </p>
+
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="cta-section">
+
+        <div class="container">
+
+            <div class="cta-card">
+
+                <div class="cta-content">
+
+                    <h2>Your workspace starts here.</h2>
+
+                    <p>
+                        Sign in to access the tools available to your account.
+                        Administrators and employees are directed to their
+                        respective workspaces.
+                    </p>
+
+                </div>
+
+                <div class="cta-actions">
+
+                    <a class="button" th:href="@{/login}">
+                        Sign In to Continue
+                        <span aria-hidden="true">→</span>
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container footer-inner">
+
+        <!-- FOOTER BRAND: Return to Home Page -->
+        <a class="brand" th:href="@{/home}">
+
+            <div class="brand-logo">SA</div>
+
+            <div>
+                <div class="brand-name">
+                    Smart Attendance
+                </div>
+
+                <div class="brand-caption">
+                    Attendance &amp; Payroll System
+                </div>
+            </div>
+
+        </a>
+
+        <div class="footer-copy">
+            &copy; <span id="currentYear"></span>
+            Smart Attendance &amp; Payroll System. All rights reserved.
+        </div>
+
+        <div class="footer-links">
+
+            <a th:href="@{/login}">Sign In</a>
+
+            <a href="#features">Features</a>
+
+            <a href="#home">Back to top ↑</a>
+
+        </div>
+
+    </div>
+</footer>
+
+<!-- JAVASCRIPT -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const menuToggle = document.getElementById('menuToggle');
+        const mainNavigation = document.getElementById('mainNavigation');
+
+        if (menuToggle && mainNavigation) {
+
+            menuToggle.addEventListener('click', function () {
+
+                const isOpen =
+                    mainNavigation.classList.toggle('open');
+
+                menuToggle.setAttribute(
+                    'aria-expanded',
+                    String(isOpen)
+                );
+
+                menuToggle.textContent = isOpen ? '✕' : '☰';
+            });
+
+            mainNavigation.querySelectorAll('a[href^="#"]').forEach(
+                function (link) {
+
+                    link.addEventListener('click', function () {
+
+                        mainNavigation.classList.remove('open');
+
+                        menuToggle.setAttribute(
+                            'aria-expanded',
+                            'false'
+                        );
+
+                        menuToggle.textContent = '☰';
+                    });
+                }
+            );
+        }
+
+        const yearElement =
+            document.getElementById('currentYear');
+
+        if (yearElement) {
+            yearElement.textContent =
+                new Date().getFullYear();
+        }
+
+    });
+</script>
+
+</body>
+</html>

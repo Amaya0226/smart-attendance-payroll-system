@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Employee | Smart Attendance &amp; Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #eef2ff;
+            --background: #f5f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e5e7eb;
+            --danger: #dc2626;
+            --shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .page-container {
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .top-header {
+            background: linear-gradient(120deg, #312e81, #4338ca, #6366f1);
+            color: white;
+            padding: 27px 30px;
+            border-radius: 16px;
+            margin-bottom: 23px;
+            box-shadow: 0 8px 22px rgba(79, 70, 229, 0.15);
+        }
+
+        .top-header h1 {
+            margin: 0 0 9px;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+        }
+
+        .top-header p {
+            margin: 0;
+            color: #e0e7ff;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .breadcrumb {
+            margin-bottom: 17px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid #edf0f5;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .heading-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 23px;
+        }
+
+        .card-heading h2 {
+            margin: 0 0 6px;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .card-heading p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 25px 0 17px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #334155;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 17px;
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px 22px;
+        }
+
+        .form-group {
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        input,
+        select {
+            display: block;
+            width: 100%;
+            min-height: 45px;
+            padding: 11px 13px;
+            border: 1px solid #dbe1ea;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        input:hover,
+        select:hover {
+            border-color: #a5b4fc;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        input[type="number"] {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .field-error {
+            color: #dc2626;
+            font-size: 11px;
+            margin-top: 6px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .field-hint {
+            color: #94a3b8;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 43px;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 13px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 17px 12px;
+            }
+
+            .top-header {
+                padding: 22px 20px;
+                border-radius: 13px;
+            }
+
+            .top-header h1 {
+                font-size: 21px;
+            }
+
+            .form-card {
+                padding: 20px 17px;
+                border-radius: 13px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-footer {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer-note {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <header class="top-header">
+        <h1>Edit Employee</h1>
+        <p>Update employee information and maintain accurate employee records.</p>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="/dashboard">Dashboard</a>
+        &nbsp; / &nbsp;
+        <a href="/employees">Employees</a>
+        &nbsp; / &nbsp;
+        Edit Employee
+    </div>
+
+    <div class="form-card">
+
+        <div class="card-heading">
+            <div class="heading-icon">✎</div>
+            <div>
+                <h2>Employee Information</h2>
+                <p>Update the details below and save your changes.</p>
+            </div>
+        </div>
+
+        <!-- Duplicate / Service Error -->
+        <div th:if="${errorMessage}"
+             class="error-message"
+             th:text="${errorMessage}">
+        </div>
+
+        <form th:action="@{/employees/update}"
+              th:object="${employee}"
+              method="post">
+
+            <!-- Employee ID -->
+            <input type="hidden" th:field="*{employeeId}">
+
+            <h3 class="section-title">Personal Information</h3>
+
+            <div class="form-grid">
+
+                <!-- Employee Code -->
+                <div class="form-group">
+                    <label for="employeeCode">Employee Code</label>
+                    <input type="text"
+                           id="employeeCode"
+                           th:field="*{employeeCode}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('employeeCode')}"
+                         th:errors="*{employeeCode}">
+                    </div>
+                </div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text"
+                           id="fullName"
+                           th:field="*{fullName}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('fullName')}"
+                         th:errors="*{fullName}">
+                    </div>
+                </div>
+
+                <!-- NIC -->
+                <div class="form-group">
+                    <label for="nic">NIC</label>
+                    <input type="text"
+                           id="nic"
+                           th:field="*{nic}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('nic')}"
+                         th:errors="*{nic}">
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email"
+                           id="email"
+                           th:field="*{email}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('email')}"
+                         th:errors="*{email}">
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text"
+                           id="phone"
+                           th:field="*{phone}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('phone')}"
+                         th:errors="*{phone}">
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text"
+                           id="address"
+                           th:field="*{address}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('address')}"
+                         th:errors="*{address}">
+                    </div>
+                </div>
+
+            </div>
+
+            <h3 class="section-title">Employment Information</h3>
+
+            <div class="form-grid">
+
+                <!-- Department -->
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text"
+                           id="department"
+                           th:field="*{department}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('department')}"
+                         th:errors="*{department}">
+                    </div>
+                </div>
+
+                <!-- Job Position -->
+                <div class="form-group">
+                    <label for="jobPosition">Job Position</label>
+                    <input type="text"
+                           id="jobPosition"
+                           th:field="*{jobPosition}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('jobPosition')}"
+                         th:errors="*{jobPosition}">
+                    </div>
+                </div>
+
+                <!-- Basic Salary -->
+                <div class="form-group">
+                    <label for="basicSalary">Basic Salary (Rs.)</label>
+                    <input type="number"
+                           id="basicSalary"
+                           th:field="*{basicSalary}"
+                           step="0.01"
+                           min="0">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('basicSalary')}"
+                         th:errors="*{basicSalary}">
+                    </div>
+                </div>
+
+                <!-- Joining Date -->
+                <div class="form-group">
+                    <label for="joiningDate">Joining Date</label>
+                    <input type="date"
+                           id="joiningDate"
+                           name="joiningDate"
+                           th:value="${employee.joiningDate != null ? #temporals.format(employee.joiningDate, 'yyyy-MM-dd') : ''}">
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('joiningDate')}"
+                         th:errors="*{joiningDate}">
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label for="status">Employee Status</label>
+                    <select id="status" th:field="*{status}">
+                        <option value="">-- Select Status --</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="INACTIVE">INACTIVE</option>
+                    </select>
+                    <div class="field-error"
+                         th:if="${#fields.hasErrors('status')}"
+                         th:errors="*{status}">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-footer">
+
+                <div class="footer-note">
+                    Please review the employee details before updating.
+                </div>
+
+                <div class="buttons">
+                    <a href="/employees" class="btn btn-secondary">
+                        ← Back to Employees
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        ✓ Update Employee
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

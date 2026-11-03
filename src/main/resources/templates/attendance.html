@@ -1,0 +1,946 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance Management | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #5b5ce2;
+            --primary-dark: #4849c7;
+            --primary-light: #eeeeff;
+            --background: #f5f6fb;
+            --surface: #ffffff;
+            --text: #20243a;
+            --muted: #777d92;
+            --border: #e7e9f1;
+            --green: #16834a;
+            --green-bg: #eaf8f0;
+            --red: #c53030;
+            --red-bg: #fff0f0;
+            --orange: #a96508;
+            --orange-bg: #fff5df;
+            --blue: #087c9e;
+            --blue-bg: #e8f7fc;
+            --shadow: 0 8px 30px rgba(35, 39, 75, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        /* Navigation */
+
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 4%;
+            min-height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 21px;
+        }
+
+        .brand small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--muted);
+            padding: 10px 12px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Main layout */
+
+        .container {
+            width: 100%;
+            max-width: 1450px;
+            margin: 32px auto;
+            padding: 0 25px 45px;
+        }
+
+        .breadcrumb {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 22px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin: 0 0 8px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .page-tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 9px 13px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Alerts */
+
+        .error-message,
+        .success-message {
+            padding: 14px 17px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid #ffd5d5;
+        }
+
+        .success-message {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid #ccebd9;
+        }
+
+        /* Cards */
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 23px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 8px;
+        }
+
+        .card-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 750;
+            margin: 0 0 5px;
+        }
+
+        .card-header p {
+            color: var(--muted);
+            font-size: 11px;
+            margin: 0;
+        }
+
+        .card-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+            margin: 13px 0 22px;
+        }
+
+        /* Forms */
+
+        .form-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 210px;
+        }
+
+        label {
+            display: block;
+            color: #41465d;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        select,
+        input[type="date"] {
+            width: 100%;
+            min-height: 44px;
+            padding: 12px 13px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: #fff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        select:focus,
+        input[type="date"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 92, 226, 0.10);
+        }
+
+        /* Buttons */
+
+        .button-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            min-height: 43px;
+            padding: 11px 17px;
+            border: none;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .check-in {
+            background: #16834a;
+            color: white;
+        }
+
+        .check-in:hover {
+            background: #116d3d;
+        }
+
+        .check-out {
+            background: var(--primary);
+            color: white;
+        }
+
+        .check-out:hover {
+            background: var(--primary-dark);
+        }
+
+        .mark-absent {
+            background: #d74747;
+            color: white;
+        }
+
+        .mark-absent:hover {
+            background: #bd3030;
+        }
+
+        .confirm-button {
+            min-height: 34px;
+            padding: 8px 12px;
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid #ccebd9;
+            font-size: 10px;
+        }
+
+        .confirm-button:hover {
+            background: #d9f2e4;
+        }
+
+        /* Attendance table */
+
+        .table-card {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .table-card-header {
+            padding: 23px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-card-header h2 {
+            font-size: 16px;
+            margin: 0 0 5px;
+        }
+
+        .table-card-header p {
+            color: var(--muted);
+            font-size: 11px;
+            margin: 0;
+        }
+
+        .record-label {
+            background: #f0f1f6;
+            color: #62677c;
+            border-radius: 20px;
+            padding: 7px 12px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: #f8f9fc;
+            color: #686e83;
+            padding: 15px 13px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 15px 13px;
+            font-size: 11px;
+            color: #454a60;
+            border-bottom: 1px solid #eff0f5;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: #fafaff;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status,
+        .confirmed-label,
+        .pending-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .present,
+        .confirmed-label {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .absent {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .late {
+            background: var(--orange-bg);
+            color: var(--orange);
+        }
+
+        .leave {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        .pending-label {
+            background: var(--orange-bg);
+            color: var(--orange);
+            margin-top: 6px;
+        }
+
+        .action-form {
+            margin: 0;
+        }
+
+        .delete-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .delete-button:hover {
+            background: #ffdddd;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 45px 20px !important;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .empty-icon {
+            display: block;
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .table-hint {
+            padding: 13px 20px;
+            background: #fafaff;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 900px) {
+            .topbar {
+                padding: 14px 22px;
+            }
+
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 5px;
+            }
+
+            .container {
+                padding: 0 18px 35px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 23px auto;
+                padding: 0 13px 30px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 19px;
+            }
+
+            .form-row {
+                align-items: stretch;
+            }
+
+            .form-group {
+                min-width: 100%;
+            }
+
+            .button-group {
+                width: 100%;
+            }
+
+            .button-group button {
+                flex: 1;
+            }
+
+            .table-card {
+                padding: 0;
+            }
+
+            .table-card-header {
+                padding: 19px;
+            }
+
+            .record-label {
+                display: none;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP NAVIGATION -->
+
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-icon">◈</div>
+            <div>
+                Smart Attendance
+                <small>PAYROLL MANAGEMENT SYSTEM</small>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a th:href="@{/}" >Dashboard</a>
+            <a th:href="@{/employees}">Employees</a>
+            <a th:href="@{/attendance}" class="active">Attendance</a>
+            <a th:href="@{/qr-attendance}">QR Attendance</a>
+            <a th:href="@{/payroll}">Payroll</a>
+            <a th:href="@{/payroll-rules}">Payroll Rules</a>
+            <a th:href="@{/holidays}">Holidays</a>
+            <a th:href="@{/overtime}">Overtime</a>
+        </nav>
+
+    </header>
+
+    <main class="container">
+
+        <div class="breadcrumb">
+            <a th:href="@{/}">Dashboard</a>
+            &nbsp; / &nbsp;
+            Attendance Management
+        </div>
+
+        <div class="page-heading">
+            <div>
+                <h1>Attendance Management</h1>
+                <p>Monitor employee attendance, manage check-ins and check-outs, and review attendance records.</p>
+            </div>
+
+            <div class="page-tag">● Attendance Workspace</div>
+        </div>
+
+        <!-- ALERT MESSAGES -->
+
+        <div
+            th:if="${errorMessage}"
+            class="error-message"
+            th:text="${errorMessage}">
+        </div>
+
+        <div
+            th:if="${successMessage}"
+            class="success-message"
+            th:text="${successMessage}">
+        </div>
+
+        <!-- MARK ATTENDANCE -->
+
+        <section class="card">
+
+            <div class="card-header">
+                <div class="card-icon">◷</div>
+                <div>
+                    <h2>Mark Attendance</h2>
+                    <p>Record employee check-in and check-out times.</p>
+                </div>
+            </div>
+
+            <form>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="employeeId">Select Employee</label>
+
+                        <select
+                            id="employeeId"
+                            name="employeeId"
+                            required>
+
+                            <option value="">-- Select Employee --</option>
+
+                            <option
+                                th:each="employee : ${employees}"
+                                th:value="${employee.employeeId}"
+                                th:text="${employee.employeeCode + ' - ' + employee.fullName}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+
+                        <button
+                            type="submit"
+                            formaction="/attendance/check-in"
+                            formmethod="post"
+                            class="check-in">
+                            ✓ Check In
+                        </button>
+
+                        <button
+                            type="submit"
+                            formaction="/attendance/check-out"
+                            formmethod="post"
+                            class="check-out">
+                            ↗ Check Out
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- MARK ABSENT FOR TESTING -->
+
+        <section class="card">
+
+            <div class="card-header">
+                <div class="card-icon">!</div>
+                <div>
+                    <h2>Mark Absence (Testing)</h2>
+                    <p>Create an absence record for a selected employee.</p>
+                </div>
+            </div>
+
+            <p class="card-description">
+                Create an absence record for a test employee.
+                The record will require confirmation before it is counted
+                as a confirmed absence in payroll.
+            </p>
+
+            <form
+                th:action="@{/attendance/mark-absent}"
+                method="post"
+                onsubmit="return confirm('Mark this employee as absent on the selected date?');">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="absentEmployeeId">Select Employee</label>
+
+                        <select
+                            id="absentEmployeeId"
+                            name="employeeId"
+                            required>
+
+                            <option value="">-- Select Employee --</option>
+
+                            <option
+                                th:each="employee : ${employees}"
+                                th:value="${employee.employeeId}"
+                                th:text="${employee.employeeCode + ' - ' + employee.fullName}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attendanceDate">Absence Date</label>
+
+                        <input
+                            type="date"
+                            id="attendanceDate"
+                            name="attendanceDate"
+                            th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                            required>
+                    </div>
+
+                    <div class="button-group">
+                        <button
+                            type="submit"
+                            class="mark-absent">
+                            + Mark Absent
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- ATTENDANCE RECORDS -->
+
+        <section class="card table-card">
+
+            <div class="table-card-header">
+
+                <div>
+                    <h2>Attendance Records</h2>
+                    <p>View and manage recorded employee attendance.</p>
+                </div>
+
+                <div class="record-label">
+                    Attendance History
+                </div>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Attendance ID</th>
+                            <th>Employee ID</th>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                            <th>Absence Confirmation</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="attendance : ${attendanceList}">
+
+                            <td th:text="${attendance.attendanceId}">
+                                1
+                            </td>
+
+                            <td th:text="${attendance.employeeId}">
+                                1
+                            </td>
+
+                            <td th:text="${attendance.attendanceDate}">
+                                2026-09-07
+                            </td>
+
+                            <td th:text="${attendance.checkIn != null ? attendance.checkIn : '-'}">
+                                08:00
+                            </td>
+
+                            <td th:text="${attendance.checkOut != null ? attendance.checkOut : '-'}">
+                                17:00
+                            </td>
+
+                            <!-- ATTENDANCE STATUS -->
+
+                            <td>
+
+                                <span
+                                    th:if="${attendance.status != null and attendance.status.name() == 'PRESENT'}"
+                                    class="status present"
+                                    th:text="${attendance.status}">
+                                    PRESENT
+                                </span>
+
+                                <span
+                                    th:if="${attendance.status != null and attendance.status.name() == 'ABSENT'}"
+                                    class="status absent"
+                                    th:text="${attendance.status}">
+                                    ABSENT
+                                </span>
+
+                                <span
+                                    th:if="${attendance.status != null and attendance.status.name() == 'LATE'}"
+                                    class="status late"
+                                    th:text="${attendance.status}">
+                                    LATE
+                                </span>
+
+                                <span
+                                    th:if="${attendance.status != null and attendance.status.name() == 'LEAVE'}"
+                                    class="status leave"
+                                    th:text="${attendance.status}">
+                                    LEAVE
+                                </span>
+
+                            </td>
+
+                            <!-- ABSENCE CONFIRMATION -->
+
+                            <td>
+
+                                <div th:if="${attendance.status != null and attendance.status.name() == 'ABSENT'}">
+
+                                    <form
+                                        th:if="${!attendance.absenceConfirmed}"
+                                        th:action="@{/attendance/confirm-absence/{id}(id=${attendance.attendanceId})}"
+                                        method="post"
+                                        class="action-form"
+                                        onsubmit="return confirm('Confirm this employee absence?');">
+
+                                        <button
+                                            type="submit"
+                                            class="confirm-button">
+                                            ✓ Confirm Absence
+                                        </button>
+
+                                    </form>
+
+                                    <span
+                                        th:if="${attendance.absenceConfirmed}"
+                                        class="confirmed-label">
+                                        ✓ Confirmed
+                                    </span>
+
+                                    <span
+                                        th:if="${!attendance.absenceConfirmed}"
+                                        class="pending-label">
+                                        Pending Confirmation
+                                    </span>
+
+                                </div>
+
+                                <span th:if="${attendance.status == null or attendance.status.name() != 'ABSENT'}">
+                                    -
+                                </span>
+
+                            </td>
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <a
+                                    th:href="@{/attendance/delete/{id}(id=${attendance.attendanceId})}"
+                                    class="delete-button"
+                                    onclick="return confirm('Are you sure you want to delete this attendance record?');">
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(attendanceList)}">
+                            <td colspan="8" class="empty-message">
+                                <span class="empty-icon">◷</span>
+                                No attendance records found.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="table-hint">
+                Tip: Pending absence records must be confirmed before they are counted as confirmed absences in payroll.
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

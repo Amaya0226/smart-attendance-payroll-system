@@ -1,0 +1,745 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Attendance | Smart Attendance & Payroll</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #eef2ff;
+            --bg: #f5f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --success: #15803d;
+            --success-bg: #dcfce7;
+            --danger: #b91c1c;
+            --danger-bg: #fee2e2;
+            --warning: #92400e;
+            --warning-bg: #fef3c7;
+            --shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            min-height: 76px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        .brand-text h2 {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            color: #172033;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #475569;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-links .logout {
+            background: #fef2f2;
+            color: #dc2626;
+            margin-left: 5px;
+        }
+
+        .nav-links .logout:hover {
+            background: #fee2e2;
+        }
+
+        /* Main container */
+
+        .container {
+            width: 94%;
+            max-width: 1350px;
+            margin: 35px auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 15px;
+            margin-bottom: 26px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            color: #172033;
+        }
+
+        .page-header p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .page-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 9px 13px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Employee information */
+
+        .employee-info {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 23px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 19px;
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .section-heading h3 {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .section-heading p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            border: 1px solid #edf0f5;
+            padding: 16px;
+            border-radius: 11px;
+            min-width: 0;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            overflow-wrap: anywhere;
+        }
+
+        /* Attendance records */
+
+        .table-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-header {
+            padding: 22px 23px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-heading {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .table-heading h3 {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .table-heading p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        .record-label {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 620px;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #fafaff;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .date-value {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .time-value {
+            color: #475569;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        .status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .present {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .absent {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .late {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        /* Empty state */
+
+        .no-records {
+            text-align: center;
+            padding: 55px 20px !important;
+            color: var(--muted);
+            white-space: normal;
+        }
+
+        .empty-icon {
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border-radius: 16px;
+            font-size: 24px;
+        }
+
+        .empty-title {
+            display: block;
+            color: #334155;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .empty-description {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* Back button */
+
+        .bottom-actions {
+            margin-top: 23px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 17px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: #475569;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Footer */
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Responsive */
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 4%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 13px;
+            }
+
+            .nav-links {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .nav-links a {
+                padding: 9px 11px;
+                font-size: 11px;
+            }
+
+            .container {
+                width: 94%;
+                margin-top: 25px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .employee-info {
+                padding: 18px;
+            }
+
+            .table-header {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .brand-text h2 {
+                font-size: 14px;
+            }
+
+            .nav-links a {
+                padding: 8px 9px;
+            }
+
+            .table-heading h3 {
+                font-size: 13px;
+            }
+
+            .record-label {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <div class="brand">
+            <div class="brand-icon">✓</div>
+
+            <div class="brand-text">
+                <h2>Smart Attendance & Payroll</h2>
+                <p>Employee Self-Service Portal</p>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/employee/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/employee/attendance" class="active">
+                My Attendance
+            </a>
+
+            <a href="/logout" class="logout">
+                Logout ↗
+            </a>
+        </div>
+
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+
+            <div>
+                <h1>My Attendance</h1>
+
+                <p>
+                    View and monitor your personal attendance records.
+                </p>
+            </div>
+
+            <div class="page-tag">
+                <span>●</span>
+                Personal Attendance
+            </div>
+
+        </div>
+
+        <!-- Employee Information -->
+        <section class="employee-info">
+
+            <div class="section-heading">
+
+                <div class="section-icon">♙</div>
+
+                <div>
+                    <h3>Employee Information</h3>
+                    <p>Your registered employee details</p>
+                </div>
+
+            </div>
+
+            <div class="info-grid">
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Employee Code
+                    </span>
+
+                    <span class="info-value"
+                          th:text="${employee.employeeCode}">
+                        EMP001
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Full Name
+                    </span>
+
+                    <span class="info-value"
+                          th:text="${employee.fullName}">
+                        Employee Name
+                    </span>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Department
+                    </span>
+
+                    <span class="info-value"
+                          th:text="${employee.department}">
+                        Department
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Attendance Table -->
+        <section class="table-container">
+
+            <div class="table-header">
+
+                <div class="table-heading">
+
+                    <div class="section-icon">▦</div>
+
+                    <div>
+                        <h3>Attendance History</h3>
+                        <p>Your recorded check-in and check-out details</p>
+                    </div>
+
+                </div>
+
+                <span class="record-label">
+                    Attendance Records
+                </span>
+
+            </div>
+
+            <div class="table-scroll">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="attendance : ${attendanceList}">
+
+                            <td class="date-value"
+                                th:text="${attendance.attendanceDate}">
+                                2026-09-27
+                            </td>
+
+                            <td class="time-value"
+                                th:text="${attendance.checkIn != null ? attendance.checkIn : '-'}">
+                                08:30
+                            </td>
+
+                            <td class="time-value"
+                                th:text="${attendance.checkOut != null ? attendance.checkOut : '-'}">
+                                17:00
+                            </td>
+
+                            <td>
+
+                                <span
+                                    th:if="${attendance.status != null}"
+                                    class="status"
+                                    th:classappend="${attendance.status.name() == 'PRESENT' ? ' present' : (attendance.status.name() == 'ABSENT' ? ' absent' : ' late')}"
+                                    th:text="${attendance.status}">
+                                    PRESENT
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        <!-- No Records -->
+                        <tr th:if="${#lists.isEmpty(attendanceList)}">
+
+                            <td colspan="4" class="no-records">
+
+                                <div class="empty-icon">▦</div>
+
+                                <span class="empty-title">
+                                    No Attendance Records Found
+                                </span>
+
+                                <span class="empty-description">
+                                    Your attendance records will appear here when available.
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- Back -->
+        <div class="bottom-actions">
+
+            <a href="/employee/dashboard" class="back-btn">
+                ← Back to Dashboard
+            </a>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        Smart Attendance & Payroll System © 2026. All rights reserved.
+    </footer>
+
+</body>
+</html>
